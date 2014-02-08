@@ -2,12 +2,13 @@
 
 define([
     'underscore',
-    'backbone'
-], function (_, Backbone) {
+    'backbone',
+    'vendor/hostMapping'
+], function (_, Backbone, hostMapping) {
     'use strict';
 
     var ProblemModel = Backbone.Model.extend({
-        urlRoot: "http://127.0.0.1:8080/problems",
+        urlRoot: hostMapping.getHostName('api') + '/problems',
         idAttribute: "_id",
         defaults: {
         }

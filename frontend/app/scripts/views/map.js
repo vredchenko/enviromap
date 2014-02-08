@@ -8,8 +8,9 @@ define([
     'templates',
     'bootstrap',
     'markerclusterer',
-    'storageManager'
-], function ($, _, Backbone, ProblemModel, JST, bootstrap, MarkerClusterer, storageManager) {
+    'storageManager',
+    'vendor/hostMapping'
+], function ($, _, Backbone, ProblemModel, JST, bootstrap, MarkerClusterer, storageManager, hostMapping) {
     'use strict';
 
     var MapView = Backbone.View.extend({
@@ -62,7 +63,7 @@ define([
 
             $.ajax({
                 type: "GET",
-                url: "http://127.0.0.1:8080/problems"
+                url: hostMapping.getHostName('api') + '/problems'
             }).then(function(data) {
                 var markers = [];
                 _.each(data, function(value) {
@@ -194,7 +195,7 @@ define([
         addEmailToProblem: function(problemId, email) {
             var request = $.ajax({
                 type: 'POST',
-                url: 'http://127.0.0.1:8080/problems/add_email/' + problemId,
+                url: hostMapping.getHostName('api') + '/problems/add_email/' + problemId,
                 data: JSON.stringify({ participantEmail: email }),
                 contentType: 'application/json',
                 dataType: 'json'
