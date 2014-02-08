@@ -14,7 +14,11 @@ define([
 
         events: {
             'click .btn-add': 'addProblem',
-            'submit #add-problem form': 'submitProblem'
+            'submit #add-problem form.step1': 'submitProblem',
+            'click #add-problem form.step2 .btn-default': 'helpProblemNo',
+            'submit #add-problem form.step2': 'helpProblemYes',
+            'click #add-problem form.step3 .btn-default': 'coordinateProblemNo',
+            'submit #add-problem form.step3': 'coordinateProblemYes'
         },
 
         render: function() {
@@ -35,11 +39,15 @@ define([
                 _that.placeNewMarker(event.latLng);
             });
 
+            google.maps.event.trigger(this.map, 'resize');
+
             return this;
         },
 
         addProblem: function() {
             var _that = this;
+            this.$('.step2, step3, step4').addClass('hidden');
+            this.$('.step1').removeClass('hidden');
             this.$('#add-problem').modal();
             this.$('#add-problem').on('shown.bs.modal', function(e) {
                 google.maps.event.trigger(_that.problemMap, 'resize');
@@ -47,7 +55,41 @@ define([
         },
 
         submitProblem: function(e) {
+            // 1. Send request to backend
+            //
 
+            this.$('.step1').addClass('hidden');
+            this.$('.step2').removeClass('hidden');
+
+            return false;
+        },
+
+        helpProblemNo: function() {
+            this.$('.step2').addClass('hidden');
+            this.$('.step3').removeClass('hidden');
+
+            return false;
+        },
+
+        helpProblemYes: function() {
+            // 1. Send request to backend
+            //
+
+            return false;
+        },
+
+        coordinateProblemYes: function() {
+            // 1. Send request to backend
+            //
+
+            return false;
+        },
+
+        coordinateProblemNo: function() {
+            this.$('.step3').addClass('hidden');
+            this.$('.step4').removeClass('hidden');
+
+            return false;
         },
 
         placeNewMarker: function(location) {

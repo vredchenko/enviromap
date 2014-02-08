@@ -9,15 +9,15 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Додати проблему</h4>
             </div>
-            <form role="form">
+            <form role="form" class="step1">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Опис проблеми</label>
-                        <textarea class="form-control" rows="4" id="description" placeholder="Опишіть якомога детальніше проблему"></textarea>
+                        <label for="description">Опис проблеми</label>
+                        <textarea required="required" class="form-control" rows="4" id="description" placeholder="Опишіть якомога детальніше проблему"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputFile">Прикріпіть фото</label>
-                        <input type="file" id="exampleInputFile">
+                        <label for="photo">Прикріпіть фото</label>
+                        <input type="file" id="photo">
                         <p class="help-block"></p>
                     </div>
                     <div class="form-group">
@@ -26,9 +26,38 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
-                    <button type="button" class="btn btn-primary">Додати</button>
+                    <button type="submit" class="btn btn-primary">Додати</button>
                 </div>
             </form>
+            <form class="hidden step2">
+                <div class="modal-body">
+                    <p>Дякуєм за заявку. Чи хочете ви допомогти вирішити цю проблему?</p>
+                    <div class="form-group">
+                        <label for="email1">Email</label>
+                        <input class="form-control email" required="required" id="email1" placeholder="Вкажіть будь ласка емейл"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default">Ні</button>
+                    <button type="submit" class="btn btn-primary">Так</button>
+                </div>
+            </form>
+            <form class="hidden step3">
+                <div class="modal-body">
+                    <p>Чи хотіли б ви координувати процес?</p>
+                    <div class="form-group">
+                        <label for="email2">Email</label>
+                        <input class="form-control email" required="required" id="email2" placeholder="Вкажіть будь ласка емейл"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default">Ні</button>
+                    <button type="submit" class="btn btn-primary">Так</button>
+                </div>
+            </form>
+            <div class="hidden step4 modal-body">
+                <p>Будь-ласка проголосуйте за інші проблеми.</p>
+            </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
