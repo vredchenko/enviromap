@@ -211,7 +211,7 @@ define([
 
             var request = $.ajax({
                 type: 'POST',
-                url: 'http://127.0.0.1:8080/problems/vote_up/' + this.selectedProblem._id,
+                url: hostMapping.getHostName('api') + '/problems/vote_up/' + this.selectedProblem._id,
                 contentType: 'application/json',
                 dataType: 'json'
             }).then(function() {
