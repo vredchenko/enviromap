@@ -44,7 +44,16 @@ curl -i -X POST -H "Content-Type: application/json" -d '{"moderation":["Approved
 @todo
 ```
 
+## Settings
+
+```
+curl -is http://127.0.0.1:8080/settings
+```
 
 ## Notes:
 
  - see about deploying to https://www.openshift.com/ here: https://www.openshift.com/blogs/day-27-restify-build-correct-rest-web-services-in-nodejs
+
+ - add indexes
+
+ - add gzip support to API

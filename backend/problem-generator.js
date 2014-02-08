@@ -10,6 +10,7 @@ var dimsum        = require('dimsum')
 ,   db            = require('mongojs').connect(databaseUrl, collections)
 ,   sys           = require('sys')
 ,   exec          = require('child_process').exec
+,   conf          = require('./conf.js').config
 ;
 
 
@@ -19,28 +20,10 @@ var config        = {
 , latS:               44.386463
 , lonE:               40.228581
 , lonW:               22.137159
-, topSeverity:        5
-, statuses:           [
-    'New'
-  , 'In progress'
-  , 'Resolved'
-  , 'Failed'
-  ]
-, types:              [
-    'Deforestation'
-  , 'Waste dump'
-  , 'Illegal construction'
-  , 'Flood'
-  , 'Wildfire'
-  , 'Endengared species'
-  , 'Poaching'
-  ]
-, moderation: [
-    'Approved'
-  , 'Not approved yet'
-  //, 'Rejeceted'
-  //, 'Closed'
-  ]
+, topSeverity:        conf.dataTerms.topSeverity
+, statuses:           conf.dataTerms.probTypes
+, types:              conf.dataTerms.statuses
+, moderation:         conf.dataTerms.moderation
 };
 
 // clear collection before generating record set
@@ -68,7 +51,7 @@ var i = 0
         if ( i < config.numOfProblems ) {
           recursy(i);
         } else {
-          console.log("Done!");
+          console.log("Done generating sample records! Let me do a mongodump for you just in case..");
           
           // export to a dump
           var dumpCMD = 'mongodump -d enviromap -c env_problems -o ./_dump';

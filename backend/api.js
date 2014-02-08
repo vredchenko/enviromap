@@ -11,7 +11,9 @@ var restify       = require('restify')
 ,   collections   = ['env_problems']
 ,   db            = require('mongojs').connect(databaseUrl, collections)
 ,   env_problems  = db.collection('env_problems')
+,   config        = require('./conf.js').config
 ;
+
 
 var ip_addr = '127.0.0.1';
 var port    =  '8080';
@@ -35,6 +37,7 @@ server.post( {path: PATH                      , version: '0.0.1'} , postNewProbl
 server.post( {path: PATH +'/filter'           , version: '0.0.1'} , filterProblems  );
 server.del ( {path: PATH +'/:problemId'       , version: '0.0.1'} , deleteProblem   );
 
+server.get ( {path: '/settings'               , version: '0.0.1'} , getSettings     );
 
 function findAllProblems(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
@@ -145,4 +148,13 @@ function deleteProblem(req , res , next) {
             return next(err);
         }
     });
+}
+
+function getSettings(req , res , next) {
+    res.setHeader('Access-Control-Allow-Origin','*');
+    res.send(200, {
+        dataTerms   : config.dataTerms 
+    ,   lang        : config.lang
+    });
+    next();
 }
