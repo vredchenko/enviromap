@@ -15,6 +15,13 @@ define([
             'about': 'about'
         },
 
+        initialize: function() {
+            $('ul.navbar-nav a').click(function() {
+                $('ul.navbar-nav li.active').removeClass('active');
+                $(this).parent().addClass('active');
+            });
+        },
+
         map: function() {
             $('#main-content').html( new MapView().render().el );
         },

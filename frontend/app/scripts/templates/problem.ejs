@@ -6,7 +6,14 @@
         <p><strong>Тип проблеми:</strong> <%= probType %></p>
         <p><strong>Статус:</strong> <%= probStatus %></p>
         <p><strong>Важливість проблеми:</strong> <%= severity %>/5</p>
-        <p><strong>Кілість голосів:</strong> 15 <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up"></span></button></p>
+        <p><strong>Кілість голосів:</strong> <%= votes %>
+            <% if(voted()) { %>
+                <p class="message">Ви вже проголосували за цю проблему. Дякуємо.</p>
+            <% } else { %>
+                <button type="button" class="btn btn-success btn-vote"><span class="glyphicon glyphicon-thumbs-up"></span></button>
+                <p class="message"></p>
+            <% } %>
+        </p>
     </div>
     <div class="well well-sm">
         <img src="http://placehold.it/140x140" class="img-thumbnail">

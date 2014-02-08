@@ -91,8 +91,16 @@
             <form role="form" class="step1">
                 <div class="modal-body">
                     <div class="form-group">
+                        <label for="title">Заголовок</label>
+                        <input required="required" class="form-control" id="title" placeholder="Узагальніть проблему">
+                    </div>
+                    <div class="form-group">
                         <label for="description">Опис проблеми</label>
                         <textarea required="required" class="form-control" rows="4" id="description" placeholder="Опишіть якомога детальніше проблему"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="proposal">Пропозиція щодо рішення</label>
+                        <textarea required="required" class="form-control" rows="4" id="proposal" placeholder="Ваші пропозиції"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="photo">Прикріпіть фото</label>
@@ -113,7 +121,7 @@
                     <p>Дякуєм за заявку. Чи хочете ви допомогти вирішити цю проблему?</p>
                     <div class="form-group">
                         <label for="email1">Email</label>
-                        <input class="form-control email" required="required" id="email1" placeholder="Вкажіть будь ласка емейл"/>
+                        <input class="form-control email" required="required" id="email1" placeholder="Вкажіть будь ласка емейл" type="email"/>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -126,7 +134,7 @@
                     <p>Чи хотіли б ви координувати процес?</p>
                     <div class="form-group">
                         <label for="email2">Email</label>
-                        <input class="form-control email" required="required" id="email2" placeholder="Вкажіть будь ласка емейл"/>
+                        <input class="form-control email" required="required" id="email2" placeholder="Вкажіть будь ласка емейл" type="email"/>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -136,6 +144,9 @@
             </form>
             <div class="hidden step4 modal-body">
                 <p>Будь-ласка проголосуйте за інші проблеми.</p>
+            </div>
+            <div class="hidden step5 modal-body">
+                <p>Дякуюємо. Ми з вами звяжемось.</p>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

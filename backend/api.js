@@ -17,7 +17,7 @@ var restify       = require('restify')
 
 var ip_addr = '127.0.0.1';
 var port    =  '8080';
- 
+
 var server = restify.createServer({
     name : "enviromap"
 });
@@ -100,7 +100,7 @@ function filterProblems(req, res, next) {
         filter.severity["$lt"] = req.params.severity.upperBound;
     }
     console.log(filter);
-    
+
     env_problems.find( filter ).sort({created : -1} , function(err , success) {
         console.log('Response success ' , success);
         console.log('Response error ' , err);
@@ -130,11 +130,16 @@ function postNewProblem(req , res , next) {
     problem.probType    = req.params.probType;
     problem.probStatus  = req.params.probStatus;
     problem.severity    = req.params.severity;
-    problem.emails      = req.params.emails;
-    problem.created     = req.params.created;
-    
+    if(req.params.emails) {
+        problem.emails  = req.params.emails;
+    } else {
+        problem.emails  = [];
+    }
+    problem.created     = new Date().getTime() / 1000;
+    problem.votes       = 0;
+
     res.setHeader('Access-Control-Allow-Origin','*');
- 
+
     env_problems.save(problem , function(err , success) {
         console.log('Response success ' , success);
         console.log('Response error ' , err);
@@ -151,7 +156,7 @@ function addEmailToProblem(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
 
     env_problems.update(
-        {_id:mongojs.ObjectId(req.params.problemId)}
+        {_id:db.ObjectId(req.params.problemId)}
     ,   { $push:{emails:{$each:[req.params.participantEmail]}} }, function(err , success) {
         console.log('Response success ' , success);
         console.log('Response error ' , err);
@@ -168,7 +173,7 @@ function incProblemVoteCount(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
 
     env_problems.update(
-        {_id:mongojs.ObjectId(req.params.problemId)}
+        {_id:db.ObjectId(req.params.problemId)}
     ,   { $inc: { "votes": 1 } }, function(err , success) {
         console.log('Response success ' , success);
         console.log('Response error ' , err);
@@ -189,7 +194,7 @@ function deleteProblem(req , res , next) {
         console.log('Response error ' , err);
         if(success) {
             res.send(204);
-            return next();      
+            return next();
         } else {
             return next(err);
         }
@@ -202,7 +207,7 @@ function deleteProblem(req , res , next) {
 function getSettings(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     res.send(200, {
-        dataTerms   : config.dataTerms 
+        dataTerms   : config.dataTerms
     ,   lang        : config.lang
     });
     next();
