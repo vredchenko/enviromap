@@ -42,6 +42,8 @@ var i = 0
     , probStatus : config.statuses[Math.floor(Math.random() * config.statuses.length)]
     , severity   : Math.floor(Math.random() * (config.topSeverity)) + 1
     , created    : Math.round(new Date().getTime() / 1000)
+    , emails     : []
+    , votes      : Math.floor(Math.random() * 171) + 1
     }, function(err, saved) {
       if( err || !saved ) {
         console.log( "Error saving record", err );

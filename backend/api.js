@@ -29,15 +29,22 @@ server.listen(port ,ip_addr, function(){
     console.log('%s listening at %s ', server.name , server.url);
 });
 
-var PATH = '/problems'
-server.get ( {path: PATH                      , version: '0.0.1'} , findAllProblems );
-server.get ( {path: PATH +'/:problemId'       , version: '0.0.1'} , findProblem     );
-server.get ( {path: PATH +'/search/:keywords' , version: '0.0.1'} , searchProblems  );
-server.post( {path: PATH                      , version: '0.0.1'} , postNewProblem  );
-server.post( {path: PATH +'/filter'           , version: '0.0.1'} , filterProblems  );
-server.del ( {path: PATH +'/:problemId'       , version: '0.0.1'} , deleteProblem   );
 
-server.get ( {path: '/settings'               , version: '0.0.1'} , getSettings     );
+// routing
+
+var PATH = '/problems'
+server.get ( {path: PATH                           , version: '0.0.1'} , findAllProblems          );
+server.get ( {path: PATH +'/:problemId'            , version: '0.0.1'} , findProblem              );
+server.get ( {path: PATH +'/search/:keywords'      , version: '0.0.1'} , searchProblems           );
+server.post( {path: PATH                           , version: '0.0.1'} , postNewProblem           );
+server.post( {path: PATH +'/filter'                , version: '0.0.1'} , filterProblems           );
+server.del ( {path: PATH +'/:problemId'            , version: '0.0.1'} , deleteProblem            );
+server.post( {path: PATH +'/add_email/:problemId'  , version: '0.0.1'} , addEmailToProblem        );
+server.post( {path: PATH +'/vote_up/:problemId'    , version: '0.0.1'} , incProblemVoteCount      );
+server.get ( {path: '/settings'                    , version: '0.0.1'} , getSettings              );
+
+
+// problem collection methods
 
 function findAllProblems(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
@@ -104,7 +111,10 @@ function filterProblems(req, res, next) {
         return next(err);
     });
 }
- 
+
+
+// problem object methods
+
 function postNewProblem(req , res , next) {
     var problem = {};
 
@@ -120,6 +130,7 @@ function postNewProblem(req , res , next) {
     problem.probType    = req.params.probType;
     problem.probStatus  = req.params.probStatus;
     problem.severity    = req.params.severity;
+    problem.emails      = req.params.emails;
     problem.created     = req.params.created;
     
     res.setHeader('Access-Control-Allow-Origin','*');
@@ -135,7 +146,42 @@ function postNewProblem(req , res , next) {
         }
     });
 }
- 
+
+function addEmailToProblem(req , res , next) {
+    res.setHeader('Access-Control-Allow-Origin','*');
+
+    env_problems.update(
+        {_id:mongojs.ObjectId(req.params.problemId)}
+    ,   { $push:{emails:{$each:[req.params.participantEmail]}} }, function(err , success) {
+        console.log('Response success ' , success);
+        console.log('Response error ' , err);
+        if(success) {
+            res.send(204 , {}); // @todo return updated object
+            return next();
+        } else {
+            return next(err);
+        }
+    });
+}
+
+function incProblemVoteCount(req , res , next) {
+    res.setHeader('Access-Control-Allow-Origin','*');
+
+    env_problems.update(
+        {_id:mongojs.ObjectId(req.params.problemId)}
+    ,   { $inc: { "votes": 1 } }, function(err , success) {
+        console.log('Response success ' , success);
+        console.log('Response error ' , err);
+        if(success) {
+            res.send(204 , {}); // @todo return updated object
+            return next();
+        } else {
+            return next(err);
+        }
+    });
+}
+// @todo upsert, safe
+
 function deleteProblem(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.remove({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
@@ -149,6 +195,9 @@ function deleteProblem(req , res , next) {
         }
     });
 }
+
+
+// settings
 
 function getSettings(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
