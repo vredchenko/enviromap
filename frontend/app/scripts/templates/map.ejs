@@ -1,2 +1,34 @@
-<p>Map shown here.</p>
+<button class="btn btn-primary btn-add">Додати проблему</button>
+
 <div id="map"></div>
+
+<div class="modal fade" id="add-problem">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Додати проблему</h4>
+            </div>
+            <form role="form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Опис проблеми</label>
+                        <textarea class="form-control" rows="4" id="description" placeholder="Опишіть якомога детальніше проблему"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputFile">Прикріпіть фото</label>
+                        <input type="file" id="exampleInputFile">
+                        <p class="help-block"></p>
+                    </div>
+                    <div class="form-group">
+                        <div id="problem-map" style="width: 100%; height: 200px;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
+                    <button type="button" class="btn btn-primary">Додати</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
