@@ -36,3 +36,8 @@ curl -is http://127.0.0.1:8080/problems
 @todo
 ```
 
+
+## Notes:
+
+ - see about deploying to https://www.openshift.com/
+ - read about deploying here: https://www.openshift.com/blogs/day-27-restify-build-correct-rest-web-services-in-nodejs

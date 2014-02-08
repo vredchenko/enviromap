@@ -37,8 +37,8 @@ server.del( {path: PATH +'/:problemId' , version: '0.0.1'} , deleteProblem  );
 function findAllProblems(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.find().sort({created : -1} , function(err , success) {
-        console.log('Response success ' + success);
-        console.log('Response error ' + err);
+        console.log('Response success ' , success);
+        console.log('Response error ' , err);
         if(success) {
             res.send(200 , success);
             return next();
@@ -51,8 +51,8 @@ function findAllProblems(req, res , next) {
 function findProblem(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.findOne({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
-        console.log('Response success ' + success);
-        console.log('Response error ' + err);
+        console.log('Response success ' , success);
+        console.log('Response error ' , err);
         if(success) {
             res.send(200 , success);
             return next();
@@ -76,8 +76,8 @@ function postNewProblem(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
  
     env_problems.save(problem , function(err , success) {
-        console.log('Response success ' + success);
-        console.log('Response error ' + err);
+        console.log('Response success ' , success);
+        console.log('Response error ' , err);
         if(success) {
             res.send(201 , problem);
             return next();
@@ -90,8 +90,8 @@ function postNewProblem(req , res , next) {
 function deleteProblem(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.remove({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
-        console.log('Response success ' + success);
-        console.log('Response error ' + err);
+        console.log('Response success ' , success);
+        console.log('Response error ' , err);
         if(success) {
             res.send(204);
             return next();      
