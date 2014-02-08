@@ -2,6 +2,8 @@
  * Generate a sample dataset of environmental problems.
  */
 
+// @todo: get to the bottom of my 4 missing records
+
 var dimsum        = require('dimsum')
 ,   databaseUrl   = 'enviromap' // "username:password@example.com/mydb"
 ,   collections   = ['env_problems']
