@@ -12,6 +12,14 @@ curl -i -X POST -H "Content-Type: application/json" -d '{"title" : "Ipsum ipsam 
 curl -is http://127.0.0.1:8080/problems
 ```
 
+## To find problems using filters
+
+Any combination of the following filters can be used:
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"moderation":["Approved"],"probType":["Deforestation","Flood"],"probStatus":["New","Failed"],"severity":{"lowerBound":2,"upperBound":4}}' http://127.0.0.1:8080/problems/filter
+```
+
 ## Delete a problem
 
 ```
@@ -39,5 +47,4 @@ curl -is http://127.0.0.1:8080/problems
 
 ## Notes:
 
- - see about deploying to https://www.openshift.com/
- - read about deploying here: https://www.openshift.com/blogs/day-27-restify-build-correct-rest-web-services-in-nodejs
+ - see about deploying to https://www.openshift.com/ here: https://www.openshift.com/blogs/day-27-restify-build-correct-rest-web-services-in-nodejs

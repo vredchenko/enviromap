@@ -28,10 +28,12 @@ server.listen(port ,ip_addr, function(){
 });
 
 var PATH = '/problems'
-server.get( {path: PATH                , version: '0.0.1'} , findAllProblems);
-server.get( {path: PATH +'/:problemId' , version: '0.0.1'} , findProblem    );
-server.post({path: PATH                , version: '0.0.1'} , postNewProblem );
-server.del( {path: PATH +'/:problemId' , version: '0.0.1'} , deleteProblem  );
+server.get ( {path: PATH                      , version: '0.0.1'} , findAllProblems );
+server.get ( {path: PATH +'/:problemId'       , version: '0.0.1'} , findProblem     );
+server.get ( {path: PATH +'/search/:keywords' , version: '0.0.1'} , searchProblems  );
+server.post( {path: PATH                      , version: '0.0.1'} , postNewProblem  );
+server.post( {path: PATH +'/filter'           , version: '0.0.1'} , filterProblems  );
+server.del ( {path: PATH +'/:problemId'       , version: '0.0.1'} , deleteProblem   );
 
 
 function findAllProblems(req, res , next) {
@@ -60,9 +62,53 @@ function findProblem(req, res , next) {
         return next(err);
     });
 }
+
+function searchProblems(req, res, next) {
+    // @todo
+}
+
+function filterProblems(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin','*');
+
+    var filter = {};
+
+    if (req.params.moderation) {
+        filter.moderation = { "$in": req.params.moderation };
+    }
+    if (req.params.probType) {
+        filter.probType = { "$in": req.params.probType };
+    }
+    if (req.params.probStatus) {
+        filter.probStatus = { "$in": req.params.probStatus };
+    }
+
+    filter.severity = {};
+    if (req.params.severity.lowerBound) {
+        filter.severity["$gt"] = req.params.severity.lowerBound;
+    }
+    if (req.params.severity.upperBound) {
+        filter.severity["$lt"] = req.params.severity.upperBound;
+    }
+    console.log(filter);
+    
+    env_problems.find( filter ).sort({created : -1} , function(err , success) {
+        console.log('Response success ' , success);
+        console.log('Response error ' , err);
+        if(success) {
+            res.send(200 , success);
+            return next();
+        }
+        return next(err);
+    });
+}
  
 function postNewProblem(req , res , next) {
     var problem = {};
+
+    if (req.params._id) { // update instead of create
+        problem._id = req.params._id;
+    }
+
     problem.title       = req.params.title;
     problem.content     = req.params.content;
     problem.lat         = req.params.lat;
