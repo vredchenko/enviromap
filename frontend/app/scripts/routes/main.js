@@ -16,11 +16,11 @@ define([
         },
 
         map: function() {
-            $('.container').html( new MapView().render().el );
+            $('#main-content').html( new MapView().render().el );
         },
 
         about: function() {
-            $('.container').html( new AboutView().render().el )
+            $('#main-content').html( new AboutView().render().el )
         }
 
     });

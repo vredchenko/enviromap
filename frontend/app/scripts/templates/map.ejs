@@ -1,6 +1,85 @@
-<button class="btn btn-primary btn-add">Додати проблему</button>
-
 <div id="map"></div>
+
+<div class="map-filter">
+    <form id="filter">
+        <div class="form-group">
+            <button class="btn btn-primary btn-add" type="button">Повідомити про проблему</button>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Пошук...">
+        </div>
+        <div class="form-group">
+            <label class="control-label">Тип проблеми</label>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Deforestation" checked>
+                Deforestation
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Deforestation" checked>
+                Waste dump
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Deforestation" checked>
+                Illegal construction
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Deforestation" checked>
+                Flood
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Deforestation" checked>
+                Wildfire
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Deforestation" checked>
+                Endengared
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Deforestation" checked>
+                Poaching
+              </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Статус</label>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="New" checked>
+                Нова
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Resolved" checked>
+                Вирішена
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="Failed" checked>
+                Не розвязана
+              </label>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="problem-detail">
+
+</div>
 
 <div class="modal fade" id="add-problem">
     <div class="modal-dialog">

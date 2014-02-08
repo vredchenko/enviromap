@@ -5,12 +5,14 @@ define([
     'underscore',
     'backbone',
     'templates',
-    'bootstrap'
-], function ($, _, Backbone, JST, bootstrap) {
+    'bootstrap',
+    'markerclusterer'
+], function ($, _, Backbone, JST, bootstrap, MarkerClusterer) {
     'use strict';
 
     var MapView = Backbone.View.extend({
         template: JST['app/scripts/templates/map.ejs'],
+        problemTemplate: JST['app/scripts/templates/problem.ejs'],
 
         events: {
             'click .btn-add': 'addProblem',
@@ -18,7 +20,8 @@ define([
             'click #add-problem form.step2 .btn-default': 'helpProblemNo',
             'submit #add-problem form.step2': 'helpProblemYes',
             'click #add-problem form.step3 .btn-default': 'coordinateProblemNo',
-            'submit #add-problem form.step3': 'coordinateProblemYes'
+            'submit #add-problem form.step3': 'coordinateProblemYes',
+            'click .problem-detail .close': 'closeProblem'
         },
 
         render: function() {
@@ -41,10 +44,71 @@ define([
 
             google.maps.event.trigger(this.map, 'resize');
 
+            // Quick access to detail window
+            this.$detailWindow = this.$('.problem-detail');
+
+            this.renderMarkers();
+
             return this;
         },
 
-        addProblem: function() {
+        renderMarkers: function() {
+            var _that = this;
+
+            $('.loader').show();
+
+            $.ajax({
+                method: "GET",
+                url: "http://127.0.0.1:8080/problems"
+            }).then(function(data) {
+                var markers = [];
+                _.each(data, function(value) {
+                    value.formatDate = function() {
+                        var date = new Date(this.created * 1000);
+                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
+                    }
+
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(value.lat, value.lon),
+                        problem: value
+                    });
+
+                    google.maps.event.addListener(marker, 'click', function(e) {
+                        _that.$detailWindow.hide();
+
+                        _that.$detailWindow.html(_that.problemTemplate(marker.problem));
+
+                        _that.$detailWindow.animate({
+                            width: 'show',
+                            paddingLeft: 'show',
+                            paddingRight: 'show',
+                            marginLeft: 'show',
+                            marginRight: 'show'
+                        }, 'slow');
+                    });
+
+                    markers.push(marker);
+                });
+
+                var markerCluster = new MarkerClusterer(_that.map, markers);
+            }).done(function() {
+                $('.loader').hide();
+            });
+        },
+
+        closeProblem: function() {
+            this.$detailWindow.animate({
+                width: "hide",
+                paddingLeft: "hide",
+                paddingRight: "hide",
+                marginLeft: "hide",
+                marginRight: "hide"
+            }, 'slow');
+        },
+
+        addProblem: function(e) {
+            e.preventDefault();
+
             var _that = this;
             this.$('.step2, step3, step4').addClass('hidden');
             this.$('.step1').removeClass('hidden');
