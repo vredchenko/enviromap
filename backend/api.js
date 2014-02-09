@@ -112,10 +112,10 @@ function filterProblems(req, res, next) {
     }
 
     filter.severity = {};
-    if (req.params.severity.lowerBound) {
+    if (req.params.severity && req.params.severity.lowerBound) {
         filter.severity["$gt"] = req.params.severity.lowerBound;
     }
-    if (req.params.severity.upperBound) {
+    if (req.params.severity && req.params.severity.upperBound) {
         filter.severity["$lt"] = req.params.severity.upperBound;
     }
     console.log(filter);
@@ -124,7 +124,7 @@ function filterProblems(req, res, next) {
         //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
-            res.send(201, {});
+            res.send(200, success);
             return next();
         }
         return next(err);
