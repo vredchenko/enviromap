@@ -24,7 +24,26 @@ var server = restify.createServer({
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 server.use(restify.CORS());
+//server.use(restify.fullResponse());
 
+function corsHandler(req, res, next) {
+
+    res.setHeader('Access-Control-Allow-Origin', 'http://polleze.com');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Expose-Headers', 'X-Api-Version, X-Request-Id, X-Response-Time');
+    res.setHeader('Access-Control-Max-Age', '1000');
+
+    return next();
+}
+
+function optionsRoute(req, res, next) {
+
+    res.send(200);
+    return next();
+}
+
+server.opts('/\.*/', corsHandler, optionsRoute);
 server.listen(port ,ip_addr, function(){
     console.log('%s listening at %s ', server.name , server.url);
 });
@@ -102,7 +121,7 @@ function filterProblems(req, res, next) {
     console.log(filter);
 
     env_problems.find( filter ).sort({created : -1} , function(err , success) {
-        console.log('Response success ' , success);
+        //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
             res.send(201, {});
