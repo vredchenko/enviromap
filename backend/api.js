@@ -111,7 +111,9 @@ function filterProblems(req, res, next) {
         filter.probStatus = { "$in": req.params.probStatus };
     }
 
-    filter.severity = {};
+    if (req.params.severity) {
+        filter.severity = {};
+    }
     if (req.params.severity && req.params.severity.lowerBound) {
         filter.severity["$gt"] = req.params.severity.lowerBound;
     }
