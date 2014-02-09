@@ -31,6 +31,10 @@ define([
             'change #filter .checkbox input': 'filterMarkers'
         },
 
+        initialize: function() {
+            this.markers = [];
+        },
+
         render: function() {
             var _that = this;
 
@@ -54,7 +58,7 @@ define([
             // Quick access to detail window
             this.$detailWindow = this.$('.problem-detail');
 
-            this.renderMarkers();
+            this.getMarkers();
 
             this.renderFilter();
 
@@ -73,10 +77,14 @@ define([
                     probType: data.dataTerms.probTypes,
                     probStatus: data.dataTerms.statuses
                 };
+
+                _.each(_that.searchSettings.probType, function(problem) {
+                    _that.$('#add-problem #type').append($('<option/>').val(problem).text(problem));
+                });
             }).done();
         },
 
-        renderMarkers: function() {
+        getMarkers: function() {
             var _that = this;
 
             $('.loader').show();
@@ -85,53 +93,73 @@ define([
                 type: "GET",
                 url: hostMapping.getHostName('api') + '/problems'
             }).then(function(data) {
-                var markers = [];
-                _.each(data, function(value) {
-                    value.formatDate = function() {
-                        var date = new Date(this.created * 1000);
-                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
-                    };
-
-                    value.voted = function() {
-                        return storageManager.votedFor(this._id);
-                    };
-
-                    value.leftEmail = function() {
-                        return storageManager.leftEmailFor(this._id);
-                    };
-
-                    var marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(value.lat, value.lon),
-                        problem: value
-                    });
-
-                    google.maps.event.addListener(marker, 'click', function(e) {
-                        _that.$detailWindow.hide();
-
-                        _that.$detailWindow.html(_that.problemTemplate(marker.problem));
-
-                        _that.selectedProblem = marker.problem;
-
-                        _that.$detailWindow.animate({
-                            width: 'show',
-                            paddingLeft: 'show',
-                            paddingRight: 'show',
-                            marginLeft: 'show',
-                            marginRight: 'show'
-                        }, 'slow');
-                    });
-
-                    markers.push(marker);
-                });
-
-                var markerCluster = new MarkerClusterer(_that.map, markers);
+                _that.renderMarkers(data);
             }).done(function() {
                 $('.loader').hide();
+            });;
+        },
+
+        renderMarkers: function(data) {
+            var _that = this;
+
+            _.each(this.markers, function(marker) {
+                marker.setMap(null);
             });
+
+            this.markers = [];
+
+            _.each(data, function(value) {
+                value.formatDate = function() {
+                    var date = new Date(this.created * 1000);
+                    return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
+                };
+
+                value.voted = function() {
+                    return storageManager.votedFor(this._id);
+                };
+
+                value.leftEmail = function() {
+                    return storageManager.leftEmailFor(this._id);
+                };
+
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(value.lat, value.lon),
+                    problem: value
+                });
+
+                google.maps.event.addListener(marker, 'click', function(e) {
+                    _that.$detailWindow.hide();
+
+                    _that.$detailWindow.html(_that.problemTemplate(marker.problem));
+
+                    _that.selectedProblem = marker.problem;
+
+                    _that.$detailWindow.animate({
+                        width: 'show',
+                        paddingLeft: 'show',
+                        paddingRight: 'show',
+                        marginLeft: 'show',
+                        marginRight: 'show'
+                    }, 'slow');
+                });
+
+                _that.markers.push(marker);
+            });
+
+            var markerCluster = new MarkerClusterer(_that.map, this.markers);
         },
 
         filterMarkers: function(e) {
+            var _that = this;
+
             var $checkbox = $(e.currentTarget);
+            var filterType = $checkbox.attr('class');
+
+            if($checkbox.is(':checked')) {
+                this.searchSettings[ filterType ].push($checkbox.val());
+            } else {
+                this.searchSettings[ filterType ] = _.without(this.searchSettings[ filterType ], $checkbox.val());
+            }
 
             var request = $.ajax({
                 type: 'POST',
@@ -139,11 +167,9 @@ define([
                 data: JSON.stringify(this.searchSettings),
                 contentType: 'application/json',
                 dataType: 'json'
-            }).then(function() {
-
-            }).done(function() {
-
-            });
+            }).then(function(data) {
+                _that.renderMarkers(data);
+            }).done();
         },
 
         closeProblem: function() {
@@ -167,8 +193,10 @@ define([
             this.$('#add-problem form').each(function() {
                 this.reset();
             });
-            this.marker.setMap(null);
-            delete this.marker;
+            if(this.marker) {
+                this.marker.setMap(null);
+                delete this.marker;
+            }
             this.$('#add-problem').on('shown.bs.modal', function(e) {
                 google.maps.event.trigger(_that.problemMap, 'resize');
             });
@@ -181,7 +209,10 @@ define([
 
             var data = {
                 title: this.$('.step1 #title').val(),
-                content: this.$('.step1 #description').val()
+                content: this.$('.step1 #description').val(),
+                severity: 3,
+                probType: this.$('.step1 #type').val(),
+                probStatus: "Нова"
             };
 
             data.content += '\n\n' + this.$('.step1 #proposal').val();
