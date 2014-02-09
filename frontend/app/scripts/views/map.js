@@ -148,7 +148,7 @@ define([
 
                     _that.$detailWindow.html(_that.problemTemplate(marker.problem));
 
-                    _that.selectedProblem = marker.problem; console.log(marker.problem);
+                    _that.selectedProblem = marker.problem;
 
                     _that.$detailWindow.animate({
                         width: 'show',
