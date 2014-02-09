@@ -68,7 +68,7 @@ server.get ( {path: '/settings'                    , version: '0.0.1'} , getSett
 function findAllProblems(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.find().sort({created : -1} , function(err , success) {
-        console.log('Response success ' , success);
+        //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
             res.send(200 , success);
@@ -82,7 +82,7 @@ function findAllProblems(req, res , next) {
 function findProblem(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.findOne({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
-        console.log('Response success ' , success);
+        //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
             res.send(200 , success);
@@ -123,7 +123,7 @@ function filterProblems(req, res, next) {
     console.log(filter);
 
     env_problems.find( filter ).sort({created : -1} , function(err , success) {
-        //console.log('Response success ' , success);
+        console.log('Response success ' , success.length);
         console.log('Response error ' , err);
         if(success) {
             res.send(200, success);
@@ -162,7 +162,7 @@ function postNewProblem(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
 
     env_problems.save(problem , function(err , success) {
-        console.log('Response success ' , success);
+        //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
             res.send(201 , problem);
@@ -179,7 +179,7 @@ function addEmailToProblem(req , res , next) {
     env_problems.update(
         {_id:db.ObjectId(req.params.problemId)}
     ,   { $push:{emails:{$each:[req.params.participantEmail]}} }, function(err , success) {
-        console.log('Response success ' , success);
+        //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
             res.send(204 , {}); // @todo return updated object
@@ -196,7 +196,7 @@ function incProblemVoteCount(req , res , next) {
     env_problems.update(
         {_id:db.ObjectId(req.params.problemId)}
     ,   { $inc: { "votes": 1 } }, function(err , success) {
-        console.log('Response success ' , success);
+        //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
             res.send(204 , {}); // @todo return updated object
@@ -211,7 +211,7 @@ function incProblemVoteCount(req , res , next) {
 function deleteProblem(req , res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.remove({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
-        console.log('Response success ' , success);
+        //console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
             res.send(204);

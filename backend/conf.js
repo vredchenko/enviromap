@@ -12,14 +12,13 @@ var config = {
   }
 , dataTerms: {
     probTypes: [
-     'Deforestation' 
-    , 'Waste dump'
-    , 'Illegal construction in protected area'
-    , 'Water-related problems'
-    , 'Wildfire'
-    , 'Threats to biodiversity'
-    , 'Poaching'
-    , 'Other problem'
+      'Проблеми лісів' 
+    , 'Сміттєзвалища'
+    , 'Незаконна забудова'
+    , 'Проблеми водойм'
+    , 'Загрози біорізноманіттю'
+    , 'Браконьєрство'
+    , 'Інші проблеми'
     ]
   , moderation: [
       'Approved'
@@ -28,10 +27,9 @@ var config = {
     //, 'Closed'
     ]
   , statuses:           [
-      'New'
-    , 'In progress'
-    , 'Resolved'
-    , 'Failed'
+      'Нова'
+    , 'В процесі'
+    , 'Вирішена'
     ]
   , topSeverity:        5
   }

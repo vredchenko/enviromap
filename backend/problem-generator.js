@@ -21,8 +21,8 @@ var config        = {
 , lonE:               40.228581
 , lonW:               22.137159
 , topSeverity:        conf.dataTerms.topSeverity
-, statuses:           conf.dataTerms.probTypes
-, types:              conf.dataTerms.statuses
+, statuses:           conf.dataTerms.statuses
+, types:              conf.dataTerms.probTypes
 , moderation:         conf.dataTerms.moderation
 };
 
