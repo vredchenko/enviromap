@@ -35,6 +35,16 @@ define([
             this.markers = [];
         },
 
+        icons: {
+            'Проблеми лісів': 'deforestation_icon.png',
+            'Сміттєзвалища': 'waste_icon.png',
+            'Незаконна забудова': 'construction_icon.png',
+            'Проблеми водойм': 'water_icon.png',
+            'Загрози біорізноманіттю': 'biodiversity_icon_2.png',
+            'Браконьєрство': 'poaching_icon.png',
+            'Інші проблеми': 'other_icon.png'
+        },
+
         render: function() {
             var _that = this;
 
@@ -108,6 +118,11 @@ define([
 
             this.markers = [];
 
+            if(this.markerCluster) {
+                this.markerCluster.clearMarkers();
+                this.markerCluster.resetViewport();
+            }
+
             _.each(data, function(value) {
                 value.formatDate = function() {
                     var date = new Date(this.created * 1000);
@@ -124,6 +139,7 @@ define([
 
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(value.lat, value.lon),
+                    icon: '/images/' + _that.icons[value.probType],
                     problem: value
                 });
 
@@ -132,7 +148,7 @@ define([
 
                     _that.$detailWindow.html(_that.problemTemplate(marker.problem));
 
-                    _that.selectedProblem = marker.problem;
+                    _that.selectedProblem = marker.problem; console.log(marker.problem);
 
                     _that.$detailWindow.animate({
                         width: 'show',
@@ -146,7 +162,7 @@ define([
                 _that.markers.push(marker);
             });
 
-            var markerCluster = new MarkerClusterer(_that.map, this.markers);
+            this.markerCluster = new MarkerClusterer(_that.map, this.markers);
         },
 
         filterMarkers: function(e) {

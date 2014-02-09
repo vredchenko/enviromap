@@ -15,11 +15,11 @@ var dimsum        = require('dimsum')
 
 
 var config        = {
-  numOfProblems:      2000
-, latN:               52.379581
-, latS:               44.386463
-, lonE:               40.228581
-, lonW:               22.137159
+  numOfProblems:      1000
+, latN:               50.48830116621381
+, latS:               48.9027233724569
+, lonE:               27.073439441140604
+, lonW:               34.034293824936725
 , topSeverity:        conf.dataTerms.topSeverity
 , statuses:           conf.dataTerms.statuses
 , types:              conf.dataTerms.probTypes
@@ -54,13 +54,13 @@ var i = 0
           recursy(i);
         } else {
           console.log("Done generating sample records! Let me do a mongodump for you just in case..");
-          
+
           // export to a dump
           var dumpCMD = 'mongodump -d enviromap -c env_problems -o ./_dump';
           console.log("running '" + dumpCMD + "'");
           console.log("use 'mongorestore enviromap' to restore");
 
-          exec(dumpCMD, function(error, stdout, stderr) { 
+          exec(dumpCMD, function(error, stdout, stderr) {
             sys.puts(stdout);
           });
 
