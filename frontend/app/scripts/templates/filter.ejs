@@ -1,0 +1,22 @@
+<div class="form-group">
+    <label class="control-label">Тип проблеми</label>
+    <% _.each(probTypes, function(acs) { %>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="<%= acs %>" checked class="probTypes">
+            <%= acs %>
+          </label>
+        </div>
+    <% }); %>
+</div>
+<div class="form-group">
+    <label class="control-label">Статус</label>
+    <% _.each(statuses, function(acs) { %>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="<%= acs %>" checked class="statuses">
+            <%= acs %>
+          </label>
+        </div>
+    <% }); %>
+</div>

@@ -15,7 +15,7 @@ var restify       = require('restify')
 ;
 
 
-var ip_addr = '127.0.0.1';
+var ip_addr = 'localhost';
 var port    =  '8080';
 
 var server = restify.createServer({
@@ -105,7 +105,7 @@ function filterProblems(req, res, next) {
         console.log('Response success ' , success);
         console.log('Response error ' , err);
         if(success) {
-            res.send(200 , success);
+            res.send(201, {});
             return next();
         }
         return next(err);

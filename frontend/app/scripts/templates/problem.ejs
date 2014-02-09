@@ -16,6 +16,19 @@
         </p>
     </div>
     <div class="well well-sm">
+        <% if(leftEmail()) { %>
+            <p>Дякуємо. Ви вже долучились до вирішення цієї проблеми.</p>
+        <% } else { %>
+            <form id="submitEmail">
+                <div class="form-group">
+                    <input type="email" class="form-control" required="required" name="email" placeholder="Вкажіть вашу електронну адресу">
+                </div>
+                <button type="submit" class="btn btn-success btn-email">Долучутися до вирішення цієї проблеми</button>
+                <p class="email-message"></p>
+            </form>
+        <% } %>
+    </div>
+    <div class="well well-sm">
         <img src="http://placehold.it/140x140" class="img-thumbnail">
         <img src="http://placehold.it/140x140" class="img-thumbnail">
         <img src="http://placehold.it/140x140" class="img-thumbnail">

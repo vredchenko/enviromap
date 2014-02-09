@@ -16,6 +16,7 @@ define([
     var MapView = Backbone.View.extend({
         template: JST['app/scripts/templates/map.ejs'],
         problemTemplate: JST['app/scripts/templates/problem.ejs'],
+        filterTemplate: JST['app/scripts/templates/filter.ejs'],
 
         events: {
             'click .btn-add': 'addProblem',
@@ -25,7 +26,9 @@ define([
             'click #add-problem form.step3 .btn-default': 'coordinateProblemNo',
             'submit #add-problem form.step3': 'helpProblemYes',
             'click .problem-detail .close': 'closeProblem',
-            'click .problem-detail .btn-vote': 'voteForProblem'
+            'click .problem-detail .btn-vote': 'voteForProblem',
+            'submit .problem-detail #submitEmail': 'submitEmail',
+            'change #filter .checkbox input': 'filterMarkers'
         },
 
         render: function() {
@@ -53,7 +56,24 @@ define([
 
             this.renderMarkers();
 
+            this.renderFilter();
+
             return this;
+        },
+
+        renderFilter: function() {
+            var _that = this;
+
+            $.ajax({
+                type: "GET",
+                url: hostMapping.getHostName('api') + '/settings'
+            }).then(function(data) {
+                _that.$('.map-filter .settings').replaceWith(_that.filterTemplate(data.dataTerms));
+                _that.searchSettings = {
+                    probType: data.dataTerms.probTypes,
+                    probStatus: data.dataTerms.statuses
+                };
+            }).done();
         },
 
         renderMarkers: function() {
@@ -70,11 +90,15 @@ define([
                     value.formatDate = function() {
                         var date = new Date(this.created * 1000);
                         return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
-                    }
+                    };
 
                     value.voted = function() {
                         return storageManager.votedFor(this._id);
-                    }
+                    };
+
+                    value.leftEmail = function() {
+                        return storageManager.leftEmailFor(this._id);
+                    };
 
                     var marker = new google.maps.Marker({
                         position: new google.maps.LatLng(value.lat, value.lon),
@@ -103,6 +127,22 @@ define([
                 var markerCluster = new MarkerClusterer(_that.map, markers);
             }).done(function() {
                 $('.loader').hide();
+            });
+        },
+
+        filterMarkers: function(e) {
+            var $checkbox = $(e.currentTarget);
+
+            var request = $.ajax({
+                type: 'POST',
+                url: hostMapping.getHostName('api') + '/problems/filter',
+                data: JSON.stringify(this.searchSettings),
+                contentType: 'application/json',
+                dataType: 'json'
+            }).then(function() {
+
+            }).done(function() {
+
             });
         },
 
@@ -218,8 +258,23 @@ define([
                 storageManager.storeVote(_that.selectedProblem._id);
             }).done(function() {
                 _that.$detailWindow.find('button.btn-vote').hide();
-                _that.$detailWindow.find('p.message').text('Дякуюєм за ваш голос!');
+                _that.$detailWindow.find('p.message').text('Дякуємо за ваш голос!');
             });
+        },
+
+        submitEmail: function(e) {
+            var _that = this;
+
+            this.$detailWindow.find('#submitEmail button[type=submit]').attr('disabled', true);
+
+            this.addEmailToProblem(this.selectedProblem._id, _that.$detailWindow.find('input[name=email]').val()).then(function(e) {
+                storageManager.storeEmail(_that.selectedProblem._id);
+            }).done(function() {
+                _that.$detailWindow.find('#submitEmail button, .form-group').hide();
+                _that.$detailWindow.find('p.email-message').text('Дякуємо що ви долучились до цієї проблеми. Ми з вами звяжемось.');
+            });
+
+            return false;
         },
 
         placeNewMarker: function(location) {
