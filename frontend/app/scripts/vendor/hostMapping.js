@@ -8,13 +8,13 @@
     });
     settings.set("hostConfig", {
       "testing": {
-        "api": "http://127.0.0.1:8080"
+        "api": "http://ecomap.org/api"
       },
       "production": {
-        "api": "http://127.0.0.1:8080"
+        "api": "http://ecomap.org/api"
       },
       "development": {
-        "api": "http://localhost:8080"
+        "api": "http://localhost:8000"
       }
     });
     HostMapping = (function() {
