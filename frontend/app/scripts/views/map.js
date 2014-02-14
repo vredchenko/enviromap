@@ -182,8 +182,8 @@ define([
             this.$el.html(this.template());
 
             var mapOptions = {
-                zoom: 6,
-                styles: mapDisplayStyles
+                zoom: 6
+            //,   styles: mapDisplayStyles
             };
 
             this.map = new google.maps.Map(this.$('#map').get(0), mapOptions);
