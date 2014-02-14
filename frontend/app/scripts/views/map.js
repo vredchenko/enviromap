@@ -51,7 +51,6 @@ define([
             this.$el.html(this.template());
 
             var mapOptions = {
-                center: new google.maps.LatLng(50.3734961443035, 30.498046875),
                 zoom: 6
             };
 
@@ -63,7 +62,11 @@ define([
                 _that.placeNewMarker(event.latLng);
             });
 
-            google.maps.event.trigger(this.map, 'resize');
+            // Add small timeout so map should be put into DOM already
+            setTimeout(function() {
+                google.maps.event.trigger(_that.map, 'resize');
+                _that.map.setCenter(new google.maps.LatLng(50.3734961443035, 30.498046875));
+            }, 50);
 
             // Quick access to detail window
             this.$detailWindow = this.$('.problem-detail');
