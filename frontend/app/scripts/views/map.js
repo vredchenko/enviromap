@@ -139,7 +139,7 @@ define([
 
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(value.lat, value.lon),
-                    icon: '/images/' + _that.icons[value.probType],
+                    icon: '/images/markers/' + _that.icons[value.probType],
                     problem: value
                 });
 
