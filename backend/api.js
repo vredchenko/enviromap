@@ -16,7 +16,7 @@ var restify       = require('restify')
 
 
 var ip_addr = 'localhost';
-var port    =  '8080';
+var port    =  '8000';
 
 var server = restify.createServer({
     name : "enviromap"
