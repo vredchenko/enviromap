@@ -4,14 +4,14 @@
     settings.set("hostMapping", {
       "localhost": "development",
       "add-test-url": "testing",
-      "add-prod-url": "production"
+      "ecomap.org": "production"
     });
     settings.set("hostConfig", {
       "testing": {
         "api": "http://127.0.0.1:8080"
       },
       "production": {
-        "api": "http://127.0.0.1:8080"
+        "api": "http://ecomap.org"
       },
       "development": {
         "api": "http://localhost:8080"
