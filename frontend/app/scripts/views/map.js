@@ -53,7 +53,7 @@ define([
                       "featureType": "administrative",
                       "stylers": [
                           {
-                              "visibility": "off"
+                              "visibility": "simplified"
                           }
                       ]
                   },
