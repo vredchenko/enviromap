@@ -4,15 +4,17 @@ define([
     'jquery',
     'backbone',
     'views/map',
-    'views/about'
-], function ($, Backbone, MapView, AboutView) {
+    'views/about',
+    'views/resources'
+], function ($, Backbone, MapView, AboutView, ResourcesView) {
     'use strict';
 
     var MainRouter = Backbone.Router.extend({
         routes: {
             '': 'map',
             'map': 'map',
-            'about': 'about'
+            'about': 'about',
+            'cleaning-parks': 'cleaning_parks'
         },
 
         initialize: function() {
@@ -23,11 +25,15 @@ define([
         },
 
         map: function() {
-            $('#main-content').html( new MapView().render().el );
+          $('#main-content').html( new MapView().render().el );
         },
 
         about: function() {
-            $('#main-content').html( new AboutView().render().el )
+          $('#main-content').html( new AboutView().render().el );
+        },
+
+        cleaning_parks: function() {
+          $('#main-content').html( new ResourcesView().render().el )
         }
 
     });
