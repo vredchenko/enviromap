@@ -9,6 +9,12 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
     padding: 0.2em 0;
 }
 
+@font-face
+{
+  font-family: WWF;
+  src: url(../fonts/wwf.otf);
+}
+
 html, body, #main-content, #main-content > div {
     height: 100%;
 }
@@ -41,6 +47,34 @@ html, body, #main-content, #main-content > div {
 .navbar {
     background-color: #fff;
 }
+
+.navbar-brand {
+    font-family: WWF;
+    font-size: 1.8em;
+}
+
+h1 {
+  font-family: WWF;
+  font-size: 4em;
+  margin-bottom: 0.6em;
+}
+h4 {
+  font-family: WWF;
+  font-size: 2em;
+}
+label.control-label {
+  font-family: WWF;
+  font-size: 1.6em;
+}
+ul.nav {
+  font-family: WWF;
+  font-size: 1.4em;
+}
+ul.nav ul.dropdown-menu {
+  font-family: WWF;
+  font-size: 1em;
+}
+
 
 #main-content {
     position: relative;
