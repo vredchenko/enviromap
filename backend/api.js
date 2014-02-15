@@ -59,12 +59,28 @@ server.post( {path: PATH +'/add_email/:problemId'  , version: '0.0.1'} , addEmai
 server.post( {path: PATH +'/vote_up/:problemId'    , version: '0.0.1'} , incProblemVoteCount      );
 server.get ( {path: '/settings'                    , version: '0.0.1'} , getSettings              );
 
+// fields to return 
+// (We don't want to return emails and potentially other admin-sensitive stuff)
+var publicProjection = {
+  "$project" : {
+    "title" : 1,
+    "content" : 1,
+    "lat" : 1,
+    "lon" : 1,
+    "moderation" : 1,
+    "probType" : 1,
+    "probStatus" : 1,
+    "severity" : 1,
+    "created" : 1,
+    "votes" : 1
+  }
+};
 
 // problem collection methods
 
 function findAllProblems(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
-    env_problems.find().sort({created : -1} , function(err , success) {
+    env_problems.aggregate([publicProjection] , function(err , success) {
         //console.log('Response success ' , success);
         if (err) { console.log('Response error ' , err); }
         if(success) {
@@ -78,7 +94,7 @@ function findAllProblems(req, res , next) {
 
 function findProblem(req, res , next) {
     res.setHeader('Access-Control-Allow-Origin','*');
-    env_problems.findOne({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
+    env_problems.aggregate([publicProjection]).findOne({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
         //console.log('Response success ' , success);
         if (err) { console.log('Response error ' , err); }
         if(success) {
@@ -119,7 +135,7 @@ function filterProblems(req, res, next) {
     }
     console.log(filter);
 
-    env_problems.find( filter ).sort({created : -1} , function(err , success) {
+    env_problems.aggregate([publicProjection, {"$match": filter}, {"$sort": {created : -1}}] , function(err , success) {
         //console.log('Response success ' , success.length);
         if (err) { console.log('Response error ' , err); }
         if(success) {
