@@ -2,10 +2,11 @@
 
 define([
     'jquery',
+    'underscore',
     'backbone',
     'views/map',
     'views/static'
-], function ($, Backbone, MapView, StaticView) {
+], function ($, _, Backbone, MapView, StaticView) {
     'use strict';
 
     var MainRouter = Backbone.Router.extend({
@@ -17,9 +18,19 @@ define([
         },
 
         initialize: function() {
-            $('ul.navbar-nav a').click(function() {
+            this.on('route', function(route) {
                 $('ul.navbar-nav li.active').removeClass('active');
-                $(this).parent().addClass('active');
+
+                var routes = _.invert(this.routes);
+                var href = routes[route];
+
+                var $item = $('ul.navbar-nav a[href=#' + href + ']');
+
+                if($item.parents('.dropdown-submenu').length !== 0) {
+                    $item.parents('.dropdown-submenu').addClass('active');
+                } else {
+                    $item.parent().addClass('active');
+                }
             });
         },
 
