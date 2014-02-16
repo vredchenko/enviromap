@@ -54,6 +54,7 @@ define([
 
             var mapOptions = {
                 zoom: 6
+            ,   center: new google.maps.LatLng(50.3734961443035, 30.498046875)
             ,   styles: mapDisplayStyles
             };
 
@@ -68,8 +69,13 @@ define([
             // Add small timeout so map should be put into DOM already
             setTimeout(function() {
                 google.maps.event.trigger(_that.map, 'resize');
-                _that.map.setCenter(new google.maps.LatLng(50.3734961443035, 30.498046875));
+                _that.map.setCenter(mapOptions.center);
             }, 50);
+
+            this.$('#add-problem').on('shown.bs.modal', function(e) {
+                google.maps.event.trigger(_that.problemMap, 'resize');
+                _that.problemMap.setCenter(mapOptions.center);
+            });
 
             // Quick access to detail window
             this.$detailWindow = this.$('.problem-detail');
@@ -219,9 +225,6 @@ define([
                 this.marker.setMap(null);
                 delete this.marker;
             }
-            this.$('#add-problem').on('shown.bs.modal', function(e) {
-                google.maps.event.trigger(_that.problemMap, 'resize');
-            });
         },
 
         submitProblem: function(e) {
