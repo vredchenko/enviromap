@@ -13,6 +13,7 @@ define([
         routes: {
             '': 'map',
             'map': 'map',
+            'map/:query': 'problemPopup',
             'about': 'about',
             'cleaning-parks': 'cleaning_parks'
         },
@@ -23,6 +24,10 @@ define([
 
                 var routes = _.invert(this.routes);
                 var href = routes[route];
+
+                if(href.indexOf('/') !== -1) {
+                    href = href.substr(0, href.indexOf('/'));
+                }
 
                 var $item = $('ul.navbar-nav a[href=#' + href + ']');
 
@@ -35,15 +40,19 @@ define([
         },
 
         map: function() {
-          $('#main-content').html( new MapView().render().el );
+            $('#main-content').html( new MapView().render().el );
+        },
+
+        problemPopup: function(problemId) {
+            $('#main-content').html( new MapView({ showProblem: problemId }).render().el );
         },
 
         about: function() {
-          $('#main-content').html( new StaticView({ template: 'app/scripts/templates/about.ejs' }).render().el );
+            $('#main-content').html( new StaticView({ template: 'app/scripts/templates/about.ejs' }).render().el );
         },
 
         cleaning_parks: function() {
-          $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/cleaning-parks.ejs' }).render().el )
+            $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/cleaning-parks.ejs' }).render().el )
         }
 
     });

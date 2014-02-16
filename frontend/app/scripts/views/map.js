@@ -32,8 +32,12 @@ define([
             'change #filter .checkbox input': 'filterMarkers'
         },
 
-        initialize: function() {
+        initialize: function(params) {
             this.markers = [];
+
+            if(params && params.showProblem) {
+                this.showProblem = params.showProblem;
+            }
         },
 
         icons: {
@@ -204,10 +208,21 @@ define([
                         marginLeft: 'show',
                         marginRight: 'show'
                     }, 'slow');
+
+                    // Change URL state, so it can be shared independently
+                    Backbone.history.navigate('map/' + marker.problem._id);
                 });
 
-                _that.markers.push(marker);
+                _that.markers[marker.problem._id] = marker;
             });
+
+            // Open marker popup if it is requested
+            if(_that.showProblem) {
+                var marker = this.markers[_that.showProblem];
+                if(marker) {
+                    google.maps.event.trigger(marker, 'click');
+                }
+            }
 
             this.markerCluster = new MarkerClusterer(_that.map, this.markers);
         },
@@ -243,6 +258,8 @@ define([
                 marginLeft: "hide",
                 marginRight: "hide"
             }, 'slow');
+
+            Backbone.history.navigate('map');
         },
 
         addProblem: function(e) {
