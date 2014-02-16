@@ -53,6 +53,7 @@ server.get ( {path: PATH                           , version: '0.0.1'} , findAll
 server.get ( {path: PATH +'/:problemId'            , version: '0.0.1'} , findProblem              );
 server.get ( {path: PATH +'/search/:keywords'      , version: '0.0.1'} , searchProblems           );
 server.post( {path: PATH                           , version: '0.0.1'} , postNewProblem           );
+server.post( {path: PATH + '/photos/:problemId'    , version: '0.0.1'} , addPhotosToProblem       );
 server.post( {path: PATH +'/filter'                , version: '0.0.1'} , filterProblems           );
 server.del ( {path: PATH +'/:problemId'            , version: '0.0.1'} , deleteProblem            );
 server.post( {path: PATH +'/add_email/:problemId'  , version: '0.0.1'} , addEmailToProblem        );
@@ -172,9 +173,6 @@ function postNewProblem(req , res , next) {
     problem.created     = new Date().getTime() / 1000;
     problem.votes       = 0;
 
-    // add image upload handling code here
-    console.log(req);
-
     res.setHeader('Access-Control-Allow-Origin','*');
 
     env_problems.save(problem , function(err , success) {
@@ -187,6 +185,20 @@ function postNewProblem(req , res , next) {
             return next(err);
         }
     });
+}
+
+function addPhotosToProblem(req , res , next) {
+    var problem = {};
+
+    if (!req.params._id) { 
+        // throw error
+    } 
+
+    problem._id = req.params._id;
+
+    console.log(req.files);
+
+    res.send(200 , {});
 }
 
 function addEmailToProblem(req , res , next) {
