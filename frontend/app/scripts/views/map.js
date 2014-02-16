@@ -9,8 +9,9 @@ define([
     'bootstrap',
     'markerclusterer',
     'storageManager',
-    'vendor/hostMapping'
-], function ($, _, Backbone, ProblemModel, JST, bootstrap, MarkerClusterer, storageManager, hostMapping) {
+    'vendor/hostMapping',
+    'dropzone'
+], function ($, _, Backbone, ProblemModel, JST, bootstrap, MarkerClusterer, storageManager, hostMapping, Dropzone) {
     'use strict';
 
     var MapView = Backbone.View.extend({
@@ -20,7 +21,7 @@ define([
 
         events: {
             'click .btn-add': 'addProblem',
-            'submit #add-problem form.step1': 'submitProblem',
+            // 'submit #add-problem form.step1': 'submitProblem',
             'click #add-problem form.step2 .btn-default': 'helpProblemNo',
             'submit #add-problem form.step2': 'helpProblemYes',
             'click #add-problem form.step3 .btn-default': 'coordinateProblemNo',
@@ -52,30 +53,19 @@ define([
 
             this.$el.html(this.template());
 
-            var mapOptions = {
+            this.mapOptions = {
                 zoom: 6
             ,   center: new google.maps.LatLng(50.3734961443035, 30.498046875)
             ,   styles: mapDisplayStyles
             };
 
-            this.map = new google.maps.Map(this.$('#map').get(0), mapOptions);
-
-            this.problemMap = new google.maps.Map(this.$('#problem-map').get(0), mapOptions);
-
-            google.maps.event.addListener(this.problemMap, 'click', function(event) {
-                _that.placeNewMarker(event.latLng);
-            });
+            this.map = new google.maps.Map(this.$('#map').get(0), this.mapOptions);
 
             // Add small timeout so map should be put into DOM already
             setTimeout(function() {
                 google.maps.event.trigger(_that.map, 'resize');
-                _that.map.setCenter(mapOptions.center);
+                _that.map.setCenter(_that.mapOptions.center);
             }, 50);
-
-            this.$('#add-problem').on('shown.bs.modal', function(e) {
-                google.maps.event.trigger(_that.problemMap, 'resize');
-                _that.problemMap.setCenter(mapOptions.center);
-            });
 
             // Quick access to detail window
             this.$detailWindow = this.$('.problem-detail');
@@ -84,7 +74,70 @@ define([
 
             this.renderFilter();
 
+            this.renderSubmitProblem();
+
             return this;
+        },
+
+        renderSubmitProblem: function() {
+            var _that = this;
+
+            this.problemMap = new google.maps.Map(this.$('#problem-map').get(0), this.mapOptions);
+
+            google.maps.event.addListener(this.problemMap, 'click', function(event) {
+                _that.placeNewMarker(event.latLng);
+            });
+
+            this.$('#add-problem').on('shown.bs.modal', function(e) {
+                google.maps.event.trigger(_that.problemMap, 'resize');
+                _that.problemMap.setCenter(_that.mapOptions.center);
+            });
+
+            Dropzone.autoDiscover = false;
+
+            // Configure Dropzone plugin
+            this.myDropzone = new Dropzone(this.$("form.dropzone").get(0), {
+                url: hostMapping.getHostName('api') + '/problems',
+                autoProcessQueue: false,
+                uploadMultiple: true,
+                parallelUploads: 6,
+                maxFiles: 6,
+                previewsContainer: _that.$("form.dropzone .dropzone-previews").get(0),
+                clickable: _that.$("form.dropzone button.choose-photos").get(0),
+
+                init: function() {
+                    var dropzone = this;
+
+                    // First change the button to actually tell Dropzone to process the queue.
+                    this.element.querySelector("button[type=submit]").addEventListener("click", function(e) {
+                        // Make sure that the form isn't actually being sent.
+                        // e.preventDefault();
+                        // e.stopPropagation();
+                        dropzone.processQueue();
+
+                        return false;
+                    });
+
+                    // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
+                    // of the sending event because uploadMultiple is set to true.
+                    this.on("sendingmultiple", function() {
+                        // Gets triggered when the form is actually being sent
+                        _that.$('.step1 button[type=submit]').attr('disabled', true);
+                    });
+
+                    this.on("successmultiple", function(files, response) {
+                        // Gets triggered when the files have successfully been sent.
+                        _that.$('.step1').addClass('hidden');
+                        _that.$('.step2').removeClass('hidden');
+                        _that.$('.step1 button[type=submit]').attr('disabled', false);
+                    });
+
+                    this.on("errormultiple", function(files, response) {
+                        // Gets triggered when there was an error sending the files.
+                        // Maybe show form again, and notify user of error
+                    });
+                }
+            });
         },
 
         renderFilter: function() {
@@ -224,6 +277,9 @@ define([
             if(this.marker) {
                 this.marker.setMap(null);
                 delete this.marker;
+            }
+            if(this.myDropzone) {
+                this.myDropzone.removeAllFiles();
             }
         },
 

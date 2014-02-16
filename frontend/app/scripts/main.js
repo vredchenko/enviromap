@@ -26,7 +26,8 @@ require.config({
         backbone: '../bower_components/backbone/backbone',
         underscore: '../bower_components/underscore/underscore',
         bootstrap: '../bower_components/sass-bootstrap/dist/js/bootstrap',
-        markerclusterer: '../scripts/vendor/markerclusterer'
+        markerclusterer: '../scripts/vendor/markerclusterer',
+        dropzone: '../bower_components/dropzone/downloads/dropzone-amd-module'
     }
 });
 

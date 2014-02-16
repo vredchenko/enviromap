@@ -28,7 +28,7 @@ server.use(restify.CORS());
 
 function corsHandler(req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://ecomap.org');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token, Cache-Control, X-Requested-With');
     res.setHeader('Access-Control-Allow-Methods', '*');
     res.setHeader('Access-Control-Expose-Headers', 'X-Api-Version, X-Request-Id, X-Response-Time');
     res.setHeader('Access-Control-Max-Age', '1000');
@@ -59,7 +59,7 @@ server.post( {path: PATH +'/add_email/:problemId'  , version: '0.0.1'} , addEmai
 server.post( {path: PATH +'/vote_up/:problemId'    , version: '0.0.1'} , incProblemVoteCount      );
 server.get ( {path: '/settings'                    , version: '0.0.1'} , getSettings              );
 
-// fields to return 
+// fields to return
 // (We don't want to return emails and potentially other admin-sensitive stuff)
 var publicProjection = {
   "$project" : {
