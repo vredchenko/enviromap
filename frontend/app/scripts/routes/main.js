@@ -4,9 +4,8 @@ define([
     'jquery',
     'backbone',
     'views/map',
-    'views/about',
-    'views/resources'
-], function ($, Backbone, MapView, AboutView, ResourcesView) {
+    'views/static'
+], function ($, Backbone, MapView, StaticView) {
     'use strict';
 
     var MainRouter = Backbone.Router.extend({
@@ -29,11 +28,11 @@ define([
         },
 
         about: function() {
-          $('#main-content').html( new AboutView().render().el );
+          $('#main-content').html( new StaticView({ template: 'app/scripts/templates/about.ejs' }).render().el );
         },
 
         cleaning_parks: function() {
-          $('#main-content').html( new ResourcesView().render().el )
+          $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/cleaning-parks.ejs' }).render().el )
         }
 
     });

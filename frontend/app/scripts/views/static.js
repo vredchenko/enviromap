@@ -8,8 +8,10 @@ define([
 ], function ($, _, Backbone, JST) {
     'use strict';
 
-    var AboutView = Backbone.View.extend({
-        template: JST['app/scripts/templates/about.ejs'],
+    var StaticView = Backbone.View.extend({
+        initialize: function(params) {
+            this.template = JST[params.template];
+        },
 
         render: function() {
             this.$el.html(this.template());
@@ -18,5 +20,5 @@ define([
         }
     });
 
-    return AboutView;
+    return StaticView;
 });
