@@ -23,7 +23,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Додати проблему</h4>
             </div>
-            <form role="form" id="submit-problem" class="step1 dropzone">
+            <form role="form" id="submit-problem" class="step1">
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="title">Заголовок</label>
@@ -43,7 +43,7 @@
                         <label for="proposal">Пропозиція щодо рішення</label>
                         <textarea required="required" class="form-control" rows="4" id="proposal" placeholder="Ваші пропозиції"></textarea>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group dropzone">
                         <label for="photo">Прикріпіть фото</label>
                         <button type="button" class="btn btn-default choose-photos">Оберіть один або кілька файлів</button>
                         <div class="dropzone-previews"></div> <!-- this is were the previews should be shown. -->

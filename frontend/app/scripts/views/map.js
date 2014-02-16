@@ -21,7 +21,7 @@ define([
 
         events: {
             'click .btn-add': 'addProblem',
-            // 'submit #add-problem form.step1': 'submitProblem',
+            'submit #add-problem form.step1': 'submitProblem',
             'click #add-problem form.step2 .btn-default': 'helpProblemNo',
             'submit #add-problem form.step2': 'helpProblemYes',
             'click #add-problem form.step3 .btn-default': 'coordinateProblemNo',
@@ -96,34 +96,16 @@ define([
             Dropzone.autoDiscover = false;
 
             // Configure Dropzone plugin
-            this.myDropzone = new Dropzone(this.$("form.dropzone").get(0), {
-                url: hostMapping.getHostName('api') + '/problems',
+            this.dropzone = new Dropzone(this.$("div.dropzone").get(0), {
+                url: hostMapping.getHostName('api') + '/problems/photos/',
                 autoProcessQueue: false,
                 uploadMultiple: true,
                 parallelUploads: 6,
                 maxFiles: 6,
-                previewsContainer: _that.$("form.dropzone .dropzone-previews").get(0),
-                clickable: _that.$("form.dropzone button.choose-photos").get(0),
+                previewsContainer: _that.$("div.dropzone .dropzone-previews").get(0),
+                clickable: _that.$("div.dropzone button.choose-photos").get(0),
 
                 init: function() {
-                    var dropzone = this;
-
-                    // First change the button to actually tell Dropzone to process the queue.
-                    this.element.querySelector("button[type=submit]").addEventListener("click", function(e) {
-                        // Make sure that the form isn't actually being sent.
-                        // e.preventDefault();
-                        // e.stopPropagation();
-                        dropzone.processQueue();
-
-                        return false;
-                    });
-
-                    // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
-                    // of the sending event because uploadMultiple is set to true.
-                    this.on("sendingmultiple", function() {
-                        // Gets triggered when the form is actually being sent
-                        _that.$('.step1 button[type=submit]').attr('disabled', true);
-                    });
 
                     this.on("successmultiple", function(files, response) {
                         // Gets triggered when the files have successfully been sent.
@@ -306,11 +288,9 @@ define([
             this.problem = new ProblemModel();
             this.problem.set(data);
             this.problem.save().then(function(data) {
-                _that.$('.step1').addClass('hidden');
-                _that.$('.step2').removeClass('hidden');
-            }).done(function() {
-                _that.$('.step1 button[type=submit]').attr('disabled', false);
-            });
+                _that.dropzone.options.url = hostMapping.getHostName('api') + '/problems/photos/' + data._id;
+                _that.dropzone.processQueue();
+            }).done();
 
             return false;
         },
