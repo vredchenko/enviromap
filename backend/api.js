@@ -209,8 +209,8 @@ function addPhotosToProblem(req , res , next) {
 
       // @todo add checks based on file type
       var imageName = req.files[k].name
-      ,   newPath = __dirname + "../cdn/img/" + imageName
-      ,   thumbPath = __dirname + "../cdn/tn/" + imageName
+      ,   newPath = __dirname + "/../cdn/img/" + imageName
+      ,   thumbPath = __dirname + "/../cdn/tn/" + imageName
       ;
 
       console.log(newPath);
