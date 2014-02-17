@@ -213,7 +213,8 @@ function addPhotosToProblem(req , res , next) {
       ,   thumbPath = __dirname + "../cdn/tn/" + imageName
       ;
 
-      fs.writeFile(newPath, data, function (err) {
+      fs.rename(req.files[k].path, newPath, function (err) {
+        if (err) throw err;
         im.resize(
           {
             srcPath: newPath,
