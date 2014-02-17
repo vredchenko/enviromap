@@ -213,8 +213,15 @@ function addPhotosToProblem(req , res , next) {
       ,   thumbPath = __dirname + "../cdn/tn/" + imageName
       ;
 
+      console.log(newPath);
+      console.log(thumbPath);
+
       fs.rename(req.files[k].path, newPath, function (err) {
+
         if (err) throw err;
+        
+        console.log("renamed");
+
         im.resize(
           {
             srcPath: newPath,
@@ -224,8 +231,9 @@ function addPhotosToProblem(req , res , next) {
         , function(err, stdout, stderr) {
            if (err) throw err;
            console.log('resized image to fit within 144x144px');
-         });
-        res.redirect("/cdn/img/" + imageName);
+          }
+        );
+        //res.redirect("/cdn/img/" + imageName);
       });
     }
     
