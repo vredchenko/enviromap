@@ -7,6 +7,8 @@
 // @todo: export databse and other environment settings to a separate config
 
 var restify       = require('restify')
+,   im            = require('imagemagick')
+,   fs            = require('fs')
 ,   databaseUrl   = 'enviromap' // "username:password@example.com/mydb"
 ,   collections   = ['env_problems']
 ,   db            = require('mongojs').connect(databaseUrl, collections)
@@ -134,7 +136,7 @@ function filterProblems(req, res, next) {
     if (req.params.severity && req.params.severity.upperBound) {
         filter.severity["$lt"] = req.params.severity.upperBound;
     }
-    console.log(filter);
+    //console.log(filter);
 
     env_problems.aggregate([publicProjection, {"$match": filter}, {"$sort": {created : -1}}] , function(err , success) {
         //console.log('Response success ' , success.length);
@@ -194,10 +196,38 @@ function addPhotosToProblem(req , res , next) {
         // throw error
     } 
 
-    problem._id = req.params._id;
+    problem._id     = req.params._id;
+    problem.photos  = []; // each element will hold {'tn': '/path/to/tn', 'img': '/path/to/image'}
 
-    console.log(req.files);
+    for (k in req.files) {
+      console.log({
+          'size': req.files[k].size
+      ,   'path': req.files[k].path
+      ,   'name': req.files[k].name
+      ,   'type': req.files[k].type
+      });
 
+      // @todo add checks based on file type
+      var imageName = req.files[k].name
+      ,   newPath = __dirname + "../cdn/img/" + imageName
+      ,   thumbPath = __dirname + "../cdn/tn/" + imageName
+      ;
+
+      fs.writeFile(newPath, data, function (err) {
+        im.resize(
+          {
+            srcPath: newPath,
+            dstPath: thumbPath,
+            width:   144
+          }
+        , function(err, stdout, stderr) {
+           if (err) throw err;
+           console.log('resized image to fit within 144x144px');
+         });
+        res.redirect("/cdn/img/" + imageName);
+      });
+    }
+    
     res.send(200 , {});
 }
 

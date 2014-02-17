@@ -1,5 +1,7 @@
 # RESTful API
 
+Don't forget to set up imagemagick CLI on your system!
+
 ## Add new problem object
 
 ```
