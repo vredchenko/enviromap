@@ -380,7 +380,7 @@ define([
                 storageManager.storeEmail(_that.selectedProblem._id);
             }).done(function() {
                 _that.$detailWindow.find('#submitEmail button, .form-group').hide();
-                _that.$detailWindow.find('p.email-message').text('Дякуємо що ви долучились до цієї проблеми. Ми з вами звяжемось.');
+                _that.$detailWindow.find('p.email-message').text('Дякуємо що ви долучились до цієї проблеми. Ми з вами зв&#8217;яжемось.');
             });
 
             return false;
