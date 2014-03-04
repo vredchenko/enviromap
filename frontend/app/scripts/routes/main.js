@@ -15,7 +15,8 @@ define([
             'map': 'map',
             'map/:query': 'problemPopup',
             'about': 'about',
-            'cleaning-parks': 'cleaning_parks'
+            'cleaning-parks': 'cleaning_parks',
+            'stopping-primrose-trade': 'stopping_primrose_trade'
         },
 
         initialize: function() {
@@ -52,7 +53,11 @@ define([
         },
 
         cleaning_parks: function() {
-            $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/cleaning-parks.ejs' }).render().el )
+            $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/cleaning-parks.ejs' }).render().el );
+        },
+
+        stopping_primrose_trade: function() {
+            $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/stopping-primrose-trade.ejs' }).render().el );
         }
 
     });
