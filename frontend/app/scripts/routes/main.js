@@ -16,7 +16,9 @@ define([
             'map/:query': 'problemPopup',
             'about': 'about',
             'cleaning-parks': 'cleaning_parks',
-            'stopping-primrose-trade': 'stopping_primrose_trade'
+            'stopping-primrose-trade': 'stopping_primrose_trade',
+            'removing-illegal-rubbish-dumps': 'removing_illegal_rubbish_dumps',
+            'stopping-commercial-exploitation-of-animals': 'stopping_commercial_exploitation_of_animals'
         },
 
         initialize: function() {
@@ -48,9 +50,13 @@ define([
             $('#main-content').html( new MapView({ showProblem: problemId }).render().el );
         },
 
+        // static pages:
+
         about: function() {
             $('#main-content').html( new StaticView({ template: 'app/scripts/templates/about.ejs' }).render().el );
         },
+
+        // pages that are static resources:
 
         cleaning_parks: function() {
             $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/cleaning-parks.ejs' }).render().el );
@@ -58,7 +64,17 @@ define([
 
         stopping_primrose_trade: function() {
             $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/stopping-primrose-trade.ejs' }).render().el );
+        },
+
+        removing_illegal_rubbish_dumps: function() {
+            $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/removing-illegal-rubbish-dumps.ejs' }).render().el );
+        },
+
+        stopping_commercial_exploitation_of_animals: function() {
+            $('#main-content').html( new StaticView({ template: 'app/scripts/templates/resources/stopping-commercial-exploitation-of-animals.ejs' }).render().el );
         }
+
+        // ^end static content
 
     });
 
