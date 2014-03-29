@@ -60,7 +60,7 @@ define([
             this.mapOptions = {
                 zoom: 6
             ,   center: new google.maps.LatLng(50.3734961443035, 30.498046875)
-            ,   styles: mapDisplayStyles
+            //,   styles: mapDisplayStyles
             };
 
             this.map = new google.maps.Map(this.$('#map-pane').get(0), this.mapOptions);
