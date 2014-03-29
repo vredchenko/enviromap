@@ -19,10 +19,9 @@ html, body, #main-content, #main-content > div {
     height: 100%;
 }
 
-#map {
+#map-pane {
     height: 100%;
     width: 100%;
-    margin-top: -20px;
 }
 
 .loader {
@@ -82,7 +81,9 @@ ul.nav ul.dropdown-menu {
 
 
 #main-content {
+    padding-top: 51px;
     position: relative;
+    box-sizing: border-box;
 }
 
 .container .text-muted {
@@ -95,7 +96,7 @@ ul.nav ul.dropdown-menu {
     position: absolute;
     left: 100px;
     width: 260px;
-    top: 50px;
+    top: 65px;
     padding: 18px;
     opacity: .97;
 }
@@ -107,7 +108,7 @@ ul.nav ul.dropdown-menu {
     position: absolute;
     right: 100px;
     width: 620px;
-    top: 50px;
+    top: 65px;
     padding: 18px;
     opacity: .97;
 
