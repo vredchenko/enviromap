@@ -14,7 +14,9 @@ require.config({
             exports: 'Backbone'
         },
         bootstrap: {
-            deps: ['jquery'],
+            deps: [
+                'jquery'
+            ],
             exports: 'jquery'
         },
         markerclusterer: {
@@ -27,7 +29,11 @@ require.config({
         underscore: '../bower_components/underscore/underscore',
         bootstrap: '../bower_components/sass-bootstrap/dist/js/bootstrap',
         markerclusterer: '../scripts/vendor/markerclusterer',
-        dropzone: '../scripts/vendor/dropzone-amd-module'
+        dropzone: '../bower_components/dropzone/downloads/dropzone.min',
+        modernizr: '../bower_components/modernizr/modernizr',
+        'requirejs-text': '../bower_components/requirejs-text/text',
+        requirejs: '../bower_components/requirejs/require',
+        'sass-bootstrap': '../bower_components/sass-bootstrap/dist/js/bootstrap'
     }
 });
 

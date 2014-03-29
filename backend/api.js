@@ -193,7 +193,7 @@ function addPhotosToProblem(req , res , next) {
     var problem = {};
 
     if (!req.params._id) { 
-        // throw error
+        // @todo throw error
     } 
 
     problem._id     = req.params._id;
@@ -207,10 +207,10 @@ function addPhotosToProblem(req , res , next) {
       ,   'type': req.files[k].type
       });
 
-      // @todo add checks based on file type
+      // @todo add checks based on file type, generate pseudo-random hash
       var imageName = req.files[k].name
       ,   newPath = __dirname + "/../cdn/img/" + imageName
-      ,   thumbPath = __dirname + "/../cdn/tn/" + imageName
+      ,   thumbPath = __dirname + "/../cdn/tn/tn_" + imageName
       ;
 
       console.log(newPath);
@@ -220,8 +220,6 @@ function addPhotosToProblem(req , res , next) {
 
         if (err) throw err;
         
-        console.log("renamed");
-
         im.resize(
           {
             srcPath: newPath,
@@ -229,15 +227,21 @@ function addPhotosToProblem(req , res , next) {
             width:   144
           }
         , function(err, stdout, stderr) {
-           if (err) throw err;
-           console.log('resized image to fit within 144x144px');
+            if (err) throw err;
+           
+            problem.photos.push({
+              tn   : 'tn/' + newPath
+            , img  : 'img/' + thumbPath
+            });
           }
         );
-        //res.redirect("/cdn/img/" + imageName);
       });
     }
     
-    res.send(200 , {});
+    // @todo upsert problem into mongo once all resize operations resolved
+    // ...
+
+    res.send(200 , problem);
 }
 
 function addEmailToProblem(req , res , next) {
