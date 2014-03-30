@@ -11,5 +11,6 @@
     "modernizr": "~2.6.2",
     "dropzone": "~3.8.4"
   },
-  "devDependencies": {}
+  "devDependencies": {
+  }
 }

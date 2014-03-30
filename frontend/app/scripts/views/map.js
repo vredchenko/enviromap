@@ -7,11 +7,10 @@ define([
     'models/problem',
     'templates',
     'bootstrap',
-    'markerclusterer',
-    'storageManager',
     'vendor/hostMapping',
-    'dropzone'
-], function ($, _, Backbone, ProblemModel, JST, bootstrap, MarkerClusterer, storageManager, hostMapping, Dropzone) {
+    'dropzone',
+    'storageManager'
+], function ($, _, Backbone, ProblemModel, JST, bootstrap, hostMapping, Dropzone, storageManager) {
     'use strict';
 
     var MapView = Backbone.View.extend({
@@ -53,22 +52,23 @@ define([
         render: function() {
             var _that = this;
 
-            var mapDisplayStyles = [{"featureType":"water","stylers":[{"visibility":"on"},{"color":"#acbcc9"}]},{"featureType":"landscape","stylers":[{"color":"#f2e5d4"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#c5c6c6"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#e4d7c6"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#fbfaf7"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#c5dac6"}]},{"featureType":"administrative","stylers":[{"visibility":"on"},{"lightness":33}]},{"featureType":"road"},{"featureType":"poi.park","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":20}]},{},{"featureType":"road","stylers":[{"lightness":20}]}];
-
             this.$el.html(this.template());
-
-            this.mapOptions = {
-                zoom: 6
-            ,   center: new google.maps.LatLng(50.3734961443035, 30.498046875)
-            //,   styles: mapDisplayStyles
-            };
-
-            this.map = new google.maps.Map(this.$('#map-pane').get(0), this.mapOptions);
 
             // Add small timeout so map should be put into DOM already
             setTimeout(function() {
-                google.maps.event.trigger(_that.map, 'resize');
-                _that.map.setCenter(_that.mapOptions.center);
+                
+                this.mapOptions = {
+                    zoom: 5
+                ,   center: L.latLng(50.3734961443035, 30.498046875)
+                ,   maxBounds: L.latLngBounds( L.latLng(40, 20), L.latLng(60, 40) )
+                }; // @todo set bounds for Ukraine, move to config
+                // @todo attribution should also be in config
+                this.map = L.map('map-pane', this.mapOptions);
+                // @todo move CloudMade API key to config: c80e6f7b3fa749a29b78e0057f854890
+                L.tileLayer('http://{s}.tile.cloudmade.com/c80e6f7b3fa749a29b78e0057f854890/997/256/{z}/{x}/{y}.png', {
+                  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy;  <a href="http://cloudmade.com">CloudMade</a>',
+                  maxZoom: 18
+                }).addTo(this.map);
             }, 50);
 
             // Quick access to detail window
@@ -86,16 +86,34 @@ define([
         renderSubmitProblem: function() {
             var _that = this;
 
-            this.problemMap = new google.maps.Map(this.$('#problem-map').get(0), this.mapOptions);
+            setTimeout(function() {
+                _that.problemMapOptions = {
+                    zoom: 4
+                ,   center: L.latLng(50.3734961443035, 30.498046875)
+                ,   maxBounds: L.latLngBounds( L.latLng(40, 20), L.latLng(60, 40) )
+                }; // @todo set bounds for Ukraine small map, move to and maintain in config
+                // @todo attribution should also be in config
+                _that.problemMap = L.map('problem-map', _that.problemMapOptions);
+                // @todo move CloudMade API key to config: c80e6f7b3fa749a29b78e0057f854890
+                L.tileLayer('http://{s}.tile.cloudmade.com/c80e6f7b3fa749a29b78e0057f854890/997/256/{z}/{x}/{y}.png', {
+                  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy;  <a href="http://cloudmade.com">CloudMade</a>',
+                  maxZoom: 18
+                }).addTo(_that.problemMap);
 
-            google.maps.event.addListener(this.problemMap, 'click', function(event) {
-                _that.placeNewMarker(event.latLng);
-            });
+                _that.problemMap.on('click', function(e) {
+                    _that.placeNewMarker(e.latlng);
+                });
+            }, 50);
 
-            this.$('#add-problem').on('shown.bs.modal', function(e) {
-                google.maps.event.trigger(_that.problemMap, 'resize');
-                _that.problemMap.setCenter(_that.mapOptions.center);
-            });
+            // google.maps.event.addListener(this.problemMap, 'click', function(event) {
+            //     _that.placeNewMarker(event.latLng);
+            // });
+
+            // @todo: code below redundant or needed to fix small map constraints?
+            // this.$('#add-problem').on('shown.bs.modal', function(e) {
+            //     google.maps.event.trigger(_that.problemMap, 'resize');
+            //     _that.problemMap.setCenter(_that.mapOptions.center);
+            // });
 
             Dropzone.autoDiscover = false;
 
@@ -188,32 +206,34 @@ define([
                     return storageManager.leftEmailFor(this._id);
                 };
 
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(value.lat, value.lon),
-                    icon: '/images/markers/' + _that.icons[value.probType],
-                    problem: value
-                });
+                // @continue
+                
+                // var marker = new google.maps.Marker({
+                //     position: new google.maps.LatLng(value.lat, value.lon),
+                //     icon: '/images/markers/' + _that.icons[value.probType],
+                //     problem: value
+                // });
 
-                google.maps.event.addListener(marker, 'click', function(e) {
-                    _that.$detailWindow.hide();
+                // google.maps.event.addListener(marker, 'click', function(e) {
+                //     _that.$detailWindow.hide();
 
-                    _that.$detailWindow.html(_that.problemTemplate(marker.problem));
+                //     _that.$detailWindow.html(_that.problemTemplate(marker.problem));
 
-                    _that.selectedProblem = marker.problem;
+                //     _that.selectedProblem = marker.problem;
 
-                    _that.$detailWindow.animate({
-                        width: 'show',
-                        paddingLeft: 'show',
-                        paddingRight: 'show',
-                        marginLeft: 'show',
-                        marginRight: 'show'
-                    }, 'slow');
+                //     _that.$detailWindow.animate({
+                //         width: 'show',
+                //         paddingLeft: 'show',
+                //         paddingRight: 'show',
+                //         marginLeft: 'show',
+                //         marginRight: 'show'
+                //     }, 'slow');
 
-                    // Change URL state, so it can be shared independently
-                    Backbone.history.navigate('map/' + marker.problem._id);
-                });
+                //     // Change URL state, so it can be shared independently
+                //     Backbone.history.navigate('map/' + marker.problem._id);
+                // });
 
-                _that.markers[marker.problem._id] = marker;
+                //_that.markers[marker.problem._id] = marker;
             });
 
             // Open marker popup if it is requested
@@ -224,7 +244,7 @@ define([
                 }
             }
 
-            this.markerCluster = new MarkerClusterer(_that.map, this.markers);
+            //this.markerCluster = new MarkerClusterer(_that.map, this.markers);
         },
 
         filterMarkers: function(e) {
@@ -388,15 +408,12 @@ define([
 
         placeNewMarker: function(location) {
             if(!this.marker) {
-                this.marker = new google.maps.Marker({
-                    map: this.problemMap,
-                    draggable: true
-                });
+                this.marker = L.marker(
+                    [location.lat, location.lng], {draggable: true}
+                ).addTo(this.problemMap);
             }
-
-            this.marker.setPosition(location);
-
-            this.problemMap.setCenter(location);
+            
+            this.problemMap.setView(L.latLng(location.lat, location.lng));
         }
     });
 
