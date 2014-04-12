@@ -10,8 +10,9 @@ define([
     'vendor/hostMapping',
     'dropzone',
     'storageManager',
-    'markerclusterer'
-], function ($, _, Backbone, ProblemModel, JST, bootstrap, hostMapping, Dropzone, storageManager, markerclusterer) {
+    'markerclusterer',
+    'multiple-select'
+], function ($, _, Backbone, ProblemModel, JST, bootstrap, hostMapping, Dropzone, storageManager, markerclusterer, multipleSelect) {
     'use strict';
 
     var MapView = Backbone.View.extend({
@@ -29,7 +30,7 @@ define([
             'click .problem-detail .close': 'closeProblem',
             'click .problem-detail .btn-vote': 'voteForProblem',
             'submit .problem-detail #submitEmail': 'submitEmail',
-            'change #filter .checkbox input': 'filterMarkers'
+            'change #filter select': 'filterMarkers'
         },
 
         initialize: function(params) {
@@ -58,9 +59,10 @@ define([
             // Add small timeout so map should be put into DOM already
             setTimeout(function() {
                 this.mapOptions = {
-                    zoom: 5
+                    zoom: 6
+                ,   minZoom: 6
                 ,   center: L.latLng(50.3734961443035, 30.498046875)
-                ,   maxBounds: L.latLngBounds( L.latLng(44.27, 14.53), L.latLng(52.52, 40.86) )
+                ,   maxBounds: L.latLngBounds( L.latLng(43.23, 21.56), L.latLng(52.52, 40.46) )
                 }; // @todo set bounds for Ukraine, move to config
                 // @todo attribution should also be in config
                 _that.map = L.map(_that.$('#map-pane').get(0), this.mapOptions);
@@ -89,7 +91,7 @@ define([
             _that.problemMapOptions = {
                 zoom: 5
             ,   center: L.latLng(50.3734961443035, 30.498046875)
-            ,   maxBounds: L.latLngBounds( L.latLng(44.27, 14.53), L.latLng(52.52, 40.86) )
+            ,   maxBounds: L.latLngBounds( L.latLng(44.27, 21.56), L.latLng(52.52, 40.46) )
             }; // @todo set bounds for Ukraine small map, move to and maintain in config
             // @todo attribution should also be in config
             _that.problemMap = L.map(_that.$('#problem-map').get(0), _that.problemMapOptions);
@@ -143,6 +145,9 @@ define([
                 url: hostMapping.getHostName('api') + '/settings'
             }).then(function(data) {
                 _that.$('.map-filter .settings').replaceWith(_that.filterTemplate(data.dataTerms));
+
+                _that.$('.selectpicker').selectpicker();
+
                 _that.searchSettings = {
                     probType: data.dataTerms.probTypes,
                     probStatus: data.dataTerms.statuses
@@ -180,6 +185,10 @@ define([
             this.markerCluster = new L.MarkerClusterGroup();
 
             _.each(data, function(value) {
+                if(!value.lat || !value.lon) {
+                    return true;
+                }
+
                 value.formatDate = function() {
                     var date = new Date(this.created * 1000);
                     return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
@@ -240,14 +249,10 @@ define([
         filterMarkers: function(e) {
             var _that = this;
 
-            var $checkbox = $(e.currentTarget);
-            var filterType = $checkbox.attr('class');
+            var $select = $(e.currentTarget);
+            var filterType = $select.attr('data-type');
 
-            if($checkbox.is(':checked')) {
-                this.searchSettings[ filterType ].push($checkbox.val());
-            } else {
-                this.searchSettings[ filterType ] = _.without(this.searchSettings[ filterType ], $checkbox.val());
-            }
+            this.searchSettings[ filterType ] = $select.selectpicker('val');
 
             var request = $.ajax({
                 type: 'POST',

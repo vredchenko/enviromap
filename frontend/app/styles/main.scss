@@ -1,6 +1,7 @@
 $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 
 @import "sass-bootstrap/lib/bootstrap";
+@import "bootstrap-select";
 
 .browsehappy {
     margin: 0.2em 0;
@@ -16,6 +17,10 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 }
 
 html, body, #main-content, #main-content > div {
+    height: 100%;
+}
+
+.map-wrap {
     height: 100%;
 }
 
@@ -79,7 +84,6 @@ ul.nav ul.dropdown-menu {
   font-size: 1em;
 }
 
-
 #main-content {
     padding-top: 51px;
     position: relative;
@@ -92,13 +96,14 @@ ul.nav ul.dropdown-menu {
 
 .map-filter {
     background-color: #fff;
-    border-radius: 5px;
-    position: absolute;
-    left: 100px;
-    width: 260px;
-    top: 65px;
-    padding: 18px;
-    opacity: .97;
+    padding: 18px 0;
+    z-index: 1000;
+    width: 100%;
+
+    .control-label {
+        padding-top: 0;
+        line-height: 1.2;
+    }
 }
 
 .problem-detail {
@@ -108,7 +113,7 @@ ul.nav ul.dropdown-menu {
     position: absolute;
     right: 100px;
     width: 620px;
-    top: 65px;
+    top: 124px;
     padding: 18px;
     opacity: .97;
 
@@ -117,6 +122,26 @@ ul.nav ul.dropdown-menu {
         height: 500px;
         overflow: auto;
         padding-right: 10px;
+    }
+}
+
+@media (max-width: $screen-sm-max) {
+    .problem-detail {
+        right: 10px;
+        width: 427px;
+
+        .inner {
+            width: 400px;
+        }
+    }
+}
+
+@media (max-width: $screen-md-max) {
+    #filter > div {
+        margin-bottom: 10px;
+    }
+    .problem-detail {
+        top: 280px;
     }
 }
 
