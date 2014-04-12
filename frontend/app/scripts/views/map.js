@@ -89,7 +89,7 @@ define([
             _that.problemMapOptions = {
                 zoom: 5
             ,   center: L.latLng(50.3734961443035, 30.498046875)
-            ,   maxBounds: L.latLngBounds( L.latLng(40, 20), L.latLng(60, 40) )
+            ,   maxBounds: L.latLngBounds( L.latLng(44.27, 14.53), L.latLng(52.52, 40.86) )
             }; // @todo set bounds for Ukraine small map, move to and maintain in config
             // @todo attribution should also be in config
             _that.problemMap = L.map(_that.$('#problem-map').get(0), _that.problemMapOptions);
@@ -105,7 +105,6 @@ define([
 
             this.$('#add-problem').on('shown.bs.modal', function(e) {
                 _that.problemMap.invalidateSize(false);
-                // _that.problemMap.setView(_that.problemMapOptions.center);
             });
 
             Dropzone.autoDiscover = false;
@@ -121,7 +120,6 @@ define([
                 clickable: _that.$("div.dropzone button.choose-photos").get(0),
 
                 init: function() {
-
                     this.on("successmultiple", function(files, response) {
                         // Gets triggered when the files have successfully been sent.
                         _that.$('.step1').addClass('hidden');
