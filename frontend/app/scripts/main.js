@@ -28,7 +28,7 @@ require.config({
         backbone: '../bower_components/backbone/backbone',
         underscore: '../bower_components/underscore/underscore',
         bootstrap: '../bower_components/sass-bootstrap/dist/js/bootstrap',
-        //markerclusterer: '../scripts/vendor/markerclusterer',
+        markerclusterer: '../scripts/vendor/leaflet.markercluster-src',
         dropzone: '../bower_components/dropzone/downloads/dropzone.min',
         modernizr: '../bower_components/modernizr/modernizr',
         'requirejs-text': '../bower_components/requirejs-text/text',

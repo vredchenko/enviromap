@@ -9,8 +9,9 @@ define([
     'bootstrap',
     'vendor/hostMapping',
     'dropzone',
-    'storageManager'
-], function ($, _, Backbone, ProblemModel, JST, bootstrap, hostMapping, Dropzone, storageManager) {
+    'storageManager',
+    'markerclusterer'
+], function ($, _, Backbone, ProblemModel, JST, bootstrap, hostMapping, Dropzone, storageManager, markerclusterer) {
     'use strict';
 
     var MapView = Backbone.View.extend({
@@ -56,25 +57,24 @@ define([
 
             // Add small timeout so map should be put into DOM already
             setTimeout(function() {
-                
                 this.mapOptions = {
                     zoom: 5
                 ,   center: L.latLng(50.3734961443035, 30.498046875)
-                ,   maxBounds: L.latLngBounds( L.latLng(40, 20), L.latLng(60, 40) )
+                ,   maxBounds: L.latLngBounds( L.latLng(44.27, 14.53), L.latLng(52.52, 40.86) )
                 }; // @todo set bounds for Ukraine, move to config
                 // @todo attribution should also be in config
-                this.map = L.map('map-pane', this.mapOptions);
+                _that.map = L.map(_that.$('#map-pane').get(0), this.mapOptions);
                 // @todo move CloudMade API key to config: c80e6f7b3fa749a29b78e0057f854890
                 L.tileLayer('http://{s}.tile.cloudmade.com/c80e6f7b3fa749a29b78e0057f854890/997/256/{z}/{x}/{y}.png', {
-                  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy;  <a href="http://cloudmade.com">CloudMade</a>',
-                  maxZoom: 18
-                }).addTo(this.map);
-            }, 50);
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy;  <a href="http://cloudmade.com">CloudMade</a>',
+                    maxZoom: 18
+                }).addTo(_that.map);
+
+                _that.getMarkers();
+            }, 100);
 
             // Quick access to detail window
             this.$detailWindow = this.$('.problem-detail');
-
-            this.getMarkers();
 
             this.renderFilter();
 
@@ -86,34 +86,27 @@ define([
         renderSubmitProblem: function() {
             var _that = this;
 
-            setTimeout(function() {
-                _that.problemMapOptions = {
-                    zoom: 4
-                ,   center: L.latLng(50.3734961443035, 30.498046875)
-                ,   maxBounds: L.latLngBounds( L.latLng(40, 20), L.latLng(60, 40) )
-                }; // @todo set bounds for Ukraine small map, move to and maintain in config
-                // @todo attribution should also be in config
-                _that.problemMap = L.map('problem-map', _that.problemMapOptions);
-                // @todo move CloudMade API key to config: c80e6f7b3fa749a29b78e0057f854890
-                L.tileLayer('http://{s}.tile.cloudmade.com/c80e6f7b3fa749a29b78e0057f854890/997/256/{z}/{x}/{y}.png', {
-                  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy;  <a href="http://cloudmade.com">CloudMade</a>',
-                  maxZoom: 18
-                }).addTo(_that.problemMap);
+            _that.problemMapOptions = {
+                zoom: 5
+            ,   center: L.latLng(50.3734961443035, 30.498046875)
+            ,   maxBounds: L.latLngBounds( L.latLng(40, 20), L.latLng(60, 40) )
+            }; // @todo set bounds for Ukraine small map, move to and maintain in config
+            // @todo attribution should also be in config
+            _that.problemMap = L.map(_that.$('#problem-map').get(0), _that.problemMapOptions);
+            // @todo move CloudMade API key to config: c80e6f7b3fa749a29b78e0057f854890
+            L.tileLayer('http://{s}.tile.cloudmade.com/c80e6f7b3fa749a29b78e0057f854890/997/256/{z}/{x}/{y}.png', {
+              attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy;  <a href="http://cloudmade.com">CloudMade</a>',
+              maxZoom: 18
+            }).addTo(_that.problemMap);
 
-                _that.problemMap.on('click', function(e) {
-                    _that.placeNewMarker(e.latlng);
-                });
-            }, 50);
+            _that.problemMap.on('click', function(e) {
+                _that.placeNewMarker(e.latlng);
+            });
 
-            // google.maps.event.addListener(this.problemMap, 'click', function(event) {
-            //     _that.placeNewMarker(event.latLng);
-            // });
-
-            // @todo: code below redundant or needed to fix small map constraints?
-            // this.$('#add-problem').on('shown.bs.modal', function(e) {
-            //     google.maps.event.trigger(_that.problemMap, 'resize');
-            //     _that.problemMap.setCenter(_that.mapOptions.center);
-            // });
+            this.$('#add-problem').on('shown.bs.modal', function(e) {
+                _that.problemMap.invalidateSize(false);
+                // _that.problemMap.setView(_that.problemMapOptions.center);
+            });
 
             Dropzone.autoDiscover = false;
 
@@ -181,16 +174,12 @@ define([
         renderMarkers: function(data) {
             var _that = this;
 
-            _.each(this.markers, function(marker) {
-                marker.setMap(null);
-            });
-
-            this.markers = [];
-
             if(this.markerCluster) {
-                this.markerCluster.clearMarkers();
-                this.markerCluster.resetViewport();
+                this.markerCluster.clearLayers();
+                this.markers = [];
             }
+
+            this.markerCluster = new L.MarkerClusterGroup();
 
             _.each(data, function(value) {
                 value.formatDate = function() {
@@ -206,45 +195,48 @@ define([
                     return storageManager.leftEmailFor(this._id);
                 };
 
-                // @continue
-                
-                // var marker = new google.maps.Marker({
-                //     position: new google.maps.LatLng(value.lat, value.lon),
-                //     icon: '/images/markers/' + _that.icons[value.probType],
-                //     problem: value
-                // });
+                var marker = new L.marker( L.latLng( value.lat, value.lon ), {
+                    icon: new L.icon({
+                        iconUrl: '/images/markers/' + _that.icons[value.probType],
+                        iconSize: [50, 79]
+                    })
+                } );
 
-                // google.maps.event.addListener(marker, 'click', function(e) {
-                //     _that.$detailWindow.hide();
+                marker.problem = value;
 
-                //     _that.$detailWindow.html(_that.problemTemplate(marker.problem));
+                _that.markerCluster.addLayer(marker);
 
-                //     _that.selectedProblem = marker.problem;
+                marker.on('click', function(e) {
+                    _that.$detailWindow.hide();
 
-                //     _that.$detailWindow.animate({
-                //         width: 'show',
-                //         paddingLeft: 'show',
-                //         paddingRight: 'show',
-                //         marginLeft: 'show',
-                //         marginRight: 'show'
-                //     }, 'slow');
+                    _that.$detailWindow.html(_that.problemTemplate(marker.problem));
 
-                //     // Change URL state, so it can be shared independently
-                //     Backbone.history.navigate('map/' + marker.problem._id);
-                // });
+                    _that.selectedProblem = marker.problem;
 
-                //_that.markers[marker.problem._id] = marker;
+                    _that.$detailWindow.animate({
+                        width: 'show',
+                        paddingLeft: 'show',
+                        paddingRight: 'show',
+                        marginLeft: 'show',
+                        marginRight: 'show'
+                    }, 'slow');
+
+                    // Change URL state, so it can be shared independently
+                    Backbone.history.navigate('map/' + marker.problem._id);
+                });
+
+                _that.markers[marker.problem._id] = marker;
             });
+
+            _that.map.addLayer(_that.markerCluster);
 
             // Open marker popup if it is requested
             if(_that.showProblem) {
                 var marker = this.markers[_that.showProblem];
                 if(marker) {
-                    google.maps.event.trigger(marker, 'click');
+                    marker.fire('click');
                 }
             }
-
-            //this.markerCluster = new MarkerClusterer(_that.map, this.markers);
         },
 
         filterMarkers: function(e) {
@@ -318,15 +310,21 @@ define([
             data.content += '\n\n' + this.$('.step1 #proposal').val();
 
             if(this.marker) {
-                data.lat = this.marker.getPosition().lat();
-                data.lon = this.marker.getPosition().lng();
+                data.lat = this.marker.getLatLng().lat;
+                data.lon = this.marker.getLatLng().lng;
             }
 
             this.problem = new ProblemModel();
             this.problem.set(data);
             this.problem.save().then(function(data) {
-                _that.dropzone.options.url = hostMapping.getHostName('api') + '/problems/photos/' + data._id;
-                _that.dropzone.processQueue();
+                if(_that.dropzone.getQueuedFiles().length > 0) {
+                    _that.dropzone.options.url = hostMapping.getHostName('api') + '/problems/photos/' + data._id;
+                    _that.dropzone.processQueue();
+                } else {
+                    _that.$('.step1').addClass('hidden');
+                    _that.$('.step2').removeClass('hidden');
+                    _that.$('.step1 button[type=submit]').attr('disabled', false);
+                }
             }).done();
 
             return false;
@@ -412,7 +410,7 @@ define([
                     [location.lat, location.lng], {draggable: true}
                 ).addTo(this.problemMap);
             }
-            
+
             this.problemMap.setView(L.latLng(location.lat, location.lng));
         }
     });
