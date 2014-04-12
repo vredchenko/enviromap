@@ -12,7 +12,6 @@
 ## Our stack
 
 - Persistance layer using MongoDB
-- Backend API and admin panel using node.js
-- Front-end using Backbone and Google Maps 
+- Backend API and admin panel using node.js + Mongoose + Express.js & bits
+- Front-end using Backbone and Leaflet.js (http://leafletjs.com/) 
 - Developemnt workflow using Grunt, Bower and npm
-- Pale Dawn theme for Google Maps (http://snazzymaps.com/)
