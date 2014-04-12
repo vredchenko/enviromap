@@ -4,66 +4,27 @@
  * Be nice to your fellow programmers!
  */
 
-// @todo: export databse and other environment settings to a separate config
+// @todo: export database and other environment settings to a separate config
 
-var restify       = require('restify')
-,   im            = require('imagemagick')
-,   fs            = require('fs')
-,   databaseUrl   = 'enviromap' // "username:password@example.com/mydb"
-,   collections   = ['env_problems']
-,   db            = require('mongojs').connect(databaseUrl, collections)
-,   env_problems  = db.collection('env_problems')
-,   config        = require('./conf.js').config
+var application_root  = __dirname
+,   config            = require('./conf.js').config
+,   express           = require( 'express'   )
+,   path              = require( 'path'      )
+,   mongoose          = require( 'mongoose'  )
+,   Schema            = mongoose.Schema
+,   im                = require('imagemagick')
+,   fs                = require('fs')
+,   databaseUrl       = 'mongodb://localhost/enviromap' // "username:password@example.com/mydb"
+,   collections       = ['env_problems']
+,   app               = express.createServer()
 ;
 
+var ip_addr = 'localhost'
+,   port    =  '8000'
+;
 
-var ip_addr = 'localhost';
-var port    =  '8000';
-
-var server = restify.createServer({
-    name : "enviromap"
-});
-server.use(restify.queryParser());
-server.use(restify.bodyParser());
-server.use(restify.CORS());
-//server.use(restify.fullResponse());
-
-function corsHandler(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://ecomap.org');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token, Cache-Control, X-Requested-With');
-    res.setHeader('Access-Control-Allow-Methods', '*');
-    res.setHeader('Access-Control-Expose-Headers', 'X-Api-Version, X-Request-Id, X-Response-Time');
-    res.setHeader('Access-Control-Max-Age', '1000');
-    return next();
-}
-
-function optionsRoute(req, res, next) {
-    res.send(200);
-    return next();
-}
-
-server.opts('/\.*/', corsHandler, optionsRoute);
-server.listen(port ,ip_addr, function(){
-    console.log('%s listening at %s ', server.name , server.url);
-});
-
-
-// routing
-
-var PATH = '/problems'
-server.get ( {path: PATH                           , version: '0.0.1'} , findAllProblems          );
-server.get ( {path: PATH +'/:problemId'            , version: '0.0.1'} , findProblem              );
-server.get ( {path: PATH +'/search/:keywords'      , version: '0.0.1'} , searchProblems           );
-server.post( {path: PATH                           , version: '0.0.1'} , postNewProblem           );
-server.post( {path: PATH + '/photos/:problemId'    , version: '0.0.1'} , addPhotosToProblem       );
-server.post( {path: PATH +'/filter'                , version: '0.0.1'} , filterProblems           );
-server.del ( {path: PATH +'/:problemId'            , version: '0.0.1'} , deleteProblem            );
-server.post( {path: PATH +'/add_email/:problemId'  , version: '0.0.1'} , addEmailToProblem        );
-server.post( {path: PATH +'/vote_up/:problemId'    , version: '0.0.1'} , incProblemVoteCount      );
-server.get ( {path: '/settings'                    , version: '0.0.1'} , getSettings              );
-
-// fields to return
-// (We don't want to return emails and potentially other admin-sensitive stuff)
+// fields to return to the public, as we don't want to return emails 
+// and potentially other admin-sensitive stuff
 var publicProjection = {
   "$project" : {
     "title" : 1,
@@ -79,40 +40,92 @@ var publicProjection = {
   }
 };
 
-// problem collection methods
+// schemas
+// @todo add indexes and validation as part of Mongoose definition
 
-function findAllProblems(req, res , next) {
+var Images = new Schema({
+  kind: { 
+    type:         String, 
+    enum:         ['thumbnail', 'catalog', 'detail', 'zoom'],
+    required:     true
+  },
+  url: { 
+    type:         String, 
+    required:     true 
+  }
+});
+
+var Problem = new Schema({
+  title:          { type: String, required: true },
+  description:    { type: String, required: true },
+  resolution:     { type: String, required: true },
+  lat:            { type: Number, required: true },
+  lon:            { type: Number, required: true },
+  moderation:     { type: String, required: true, enum: config.dataTerms.moderation },
+  probType:       { type: String, required: true, enum: config.dataTerms.probTypes },
+  probStatus:     { type: String, required: true, enum: config.dataTerms.statuses },
+  severity:       { type: Number, default: 1, min: 1, max: config.dataTerms.topSeverity },
+  created:        { type: Date,   default: Date.now },
+  emails:         { type: Array,  required: false },
+  votes:          { type: Number, default: 0 },
+  images:         [Images],
+  modified:       { type: Date,   default: Date.now }
+});
+
+// database connection @todo use values from config
+mongoose.connect( databaseUrl ); // @todo configure database connection
+
+// NodeJS app config
+app.configure(function () {
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(path.join(application_root, "public")));
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+});
+
+var ProblemModel = mongoose.model('Problem', Problem);
+
+// routing
+
+app.get  ( '/api', function (req, res) { res.send('API is running'); });
+app.get  ( '/api/problems/api/problems',           findAllProblems );
+app.get  ( '/api/problems/:problemId',             findProblem );
+app.get  ( '/api/problems/search/:keywords',       searchProblems );
+app.get  ( '/api/problems/api/problems',           postNewProblem );
+app.post ( '/api/problems/photos/:problemId',      addPhotosToProblem );
+app.post ( '/api/problems/filter',                 filterProblems );
+app.del  ( '/api/problems/:problemId',             deleteProblem );
+app.post ( '/api/problems/add_email/:problemId',   addEmailToProblem );
+app.post ( '/api/problems/vote_up/:problemId',     incProblemVoteCount );
+app.get  ( '/settings',                            getSettings );
+
+
+// endpoint handlers
+
+function findAllProblems(req, res) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.aggregate([publicProjection] , function(err , success) {
         //console.log('Response success ' , success);
         if (err) { console.log('Response error ' , err); }
-        if(success) {
-            res.send(200 , success);
-            return next();
-        } else {
-            return next(err);
-        }
+        res.send( success );
     });
 }
 
-function findProblem(req, res , next) {
+function findProblem(req, res) {
     res.setHeader('Access-Control-Allow-Origin','*');
     env_problems.aggregate([publicProjection]).findOne({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
         //console.log('Response success ' , success);
         if (err) { console.log('Response error ' , err); }
-        if(success) {
-            res.send(200 , success);
-            return next();
-        }
-        return next(err);
+        res.send( success );
     });
 }
 
-function searchProblems(req, res, next) {
-    // @todo
+function searchProblems(req, res) {
+    res.send( {} );
 }
 
-function filterProblems(req, res, next) {
+function filterProblems(req, res) {
     res.setHeader('Access-Control-Allow-Origin','*');
 
     var filter = {};
@@ -141,18 +154,14 @@ function filterProblems(req, res, next) {
     env_problems.aggregate([publicProjection, {"$match": filter}, {"$sort": {created : -1}}] , function(err , success) {
         //console.log('Response success ' , success.length);
         if (err) { console.log('Response error ' , err); }
-        if(success) {
-            res.send(200, success);
-            return next();
-        }
-        return next(err);
+        res.send( success );
     });
 }
 
 
 // problem object methods
 
-function postNewProblem(req , res , next) {
+function postNewProblem(req , res) {
     var problem = {};
 
     if (req.params._id) { // update instead of create
@@ -180,16 +189,11 @@ function postNewProblem(req , res , next) {
     env_problems.save(problem , function(err , success) {
         //console.log('Response success ' , success);
         if (err) { console.log('Response error ' , err); }
-        if(success) {
-            res.send(201 , problem);
-            return next();
-        } else {
-            return next(err);
-        }
+        res.send( success );
     });
 }
 
-function addPhotosToProblem(req , res , next) {
+function addPhotosToProblem(req , res) {
     var problem = {};
 
     if (!req.params._id) { 
@@ -241,10 +245,10 @@ function addPhotosToProblem(req , res , next) {
     // @todo upsert problem into mongo once all resize operations resolved
     // ...
 
-    res.send(200 , problem);
+    res.send( problem );
 }
 
-function addEmailToProblem(req , res , next) {
+function addEmailToProblem(req , res) {
     res.setHeader('Access-Control-Allow-Origin','*');
 
     env_problems.update(
@@ -252,55 +256,39 @@ function addEmailToProblem(req , res , next) {
     ,   { $push:{emails:{$each:[req.params.participantEmail]}} }, function(err , success) {
         //console.log('Response success ' , success);
         if (err) { console.log('Response error ' , err); }
-        if(success) {
-            res.send(204 , {}); // @todo return updated object
-            return next();
-        } else {
-            return next(err);
-        }
+        res.send( success );
     });
 }
 
-function incProblemVoteCount(req , res , next) {
-    res.setHeader('Access-Control-Allow-Origin','*');
+function incProblemVoteCount(req , res) {
+  res.setHeader('Access-Control-Allow-Origin','*');
 
-    env_problems.update(
-        {_id:db.ObjectId(req.params.problemId)}
-    ,   { $inc: { "votes": 1 } }, function(err , success) {
-        //console.log('Response success ' , success);
-        if (err) { console.log('Response error ' , err); }
-        if(success) {
-            res.send(204 , {}); // @todo return updated object
-            return next();
-        } else {
-            return next(err);
-        }
-    });
+  env_problems.update(
+    {_id:db.ObjectId(req.params.problemId)}
+  , { $inc: { "votes": 1 } }, function(err , success) {
+    //console.log('Response success ' , success);
+    if (err) { console.log('Response error ' , err); }
+    res.send( success );
+  });
 }
 // @todo upsert, safe
 
-function deleteProblem(req , res , next) {
-    res.setHeader('Access-Control-Allow-Origin','*');
-    env_problems.remove({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
-        //console.log('Response success ' , success);
-        if (err) { console.log('Response error ' , err); }
-        if(success) {
-            res.send(204);
-            return next();
-        } else {
-            return next(err);
-        }
-    });
+function deleteProblem(req , res) {
+  res.setHeader('Access-Control-Allow-Origin','*');
+  env_problems.remove({_id:mongojs.ObjectId(req.params.problemId)} , function(err , success) {
+      //console.log('Response success ' , success);
+      if (err) { console.log('Response error ' , err); }
+      res.send( success );
+  });
 }
 
 
 // settings
 
-function getSettings(req , res , next) {
-    res.setHeader('Access-Control-Allow-Origin','*');
-    res.send(200, {
-        dataTerms   : config.dataTerms
-    ,   lang        : config.lang
-    });
-    next();
+function getSettings(req , res) {
+  res.setHeader('Access-Control-Allow-Origin','*');
+  res.send({
+    dataTerms   : config.dataTerms
+  , lang        : config.lang
+  });
 }
