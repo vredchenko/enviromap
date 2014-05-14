@@ -63,12 +63,17 @@ define([
                 ,   minZoom: 6
                 ,   center: L.latLng(50.3734961443035, 30.498046875)
                 ,   maxBounds: L.latLngBounds( L.latLng(43.23, 21.56), L.latLng(52.52, 40.46) )
-                }; // @todo set bounds for Ukraine, move to config
+                }; 
+
+                // @todo bounds for Ukraine should be moved to config
                 // @todo attribution should also be in config
+                // @todo move MapID to config
+                var MapID = 'vredchenko.i85jm14g',
+                    mappingCredits = '<a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+                ;
                 _that.map = L.map(_that.$('#map-pane').get(0), this.mapOptions);
-                // @todo move CloudMade API key to config: c80e6f7b3fa749a29b78e0057f854890
-                L.tileLayer('http://{s}.tile.cloudmade.com/c80e6f7b3fa749a29b78e0057f854890/997/256/{z}/{x}/{y}.png', {
-                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy;  <a href="http://cloudmade.com">CloudMade</a>',
+                L.tileLayer('http://{s}.tiles.mapbox.com/v3/'+MapID+'/{z}/{x}/{y}.png', {
+                    attribution: mappingCredits,
                     maxZoom: 18
                 }).addTo(_that.map);
 
