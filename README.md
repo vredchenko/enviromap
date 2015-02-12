@@ -1,3 +1,6 @@
+# DEPRECATED Project handed over to SoftServe Academy, their re-write lives here: 
+http://ecomap.org
+
 # EcoMap - collaborating to solve ecological problems
 
 ## The idea
